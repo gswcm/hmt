@@ -168,14 +168,12 @@
 						name: '',
 						phone: ''
 					},
-					participants: {
-						registration: "school",
-						school: "",
-						grades: [
-							{ type: null, qty: 1}
-						]
+					school: {
+						name: '',
+						division: null
 					},
-					misc: {
+					team: {
+						names: [],
 						meals: 0,
 						tshirts: []
 					}

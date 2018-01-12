@@ -29,7 +29,7 @@ const commonConfig = merge([
 			new HtmlWebpackPlugin({
 				inject: false,
 				template: require("html-webpack-template-pug"),
-				title: "JMT | GSW Junior Math Tournament",
+				title: "HMT | GSW High Schools Math Tournament",
 				// mobile: true,
 				injectExtras: {
 					head: [
@@ -41,13 +41,13 @@ const commonConfig = merge([
 						{
 							tag: "meta",
 							name: "descripton",
-							content: "GSW Junior Math Tournament"
+							content: "GSW High Schools Math Tournament"
 						},
 						{
 							tag: "meta",
 							name: "keywords",
 							content:
-								"GSW, math, tournamnet, junior, elementary, JMT, Georgia, registration"
+								"GSW, math, tournamnet, high schools, HMT, Georgia, registration"
 						},
 						{
 							tag: "meta",

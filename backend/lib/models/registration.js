@@ -11,17 +11,6 @@ const tshirtSchema = mongoose.Schema({
 	}
 });
 
-const gradeSchema = mongoose.Schema({
-	type: {
-		type: String,
-		default: null
-	},
-	qty: {
-		type: Number,
-		default: 0
-	}
-});
-
 const recordSchema = mongoose.Schema({
 	sponsor: {
 		name: {
@@ -33,23 +22,23 @@ const recordSchema = mongoose.Schema({
 			default: ''
 		},
 	},
-	participants: {
-		school: {
+	school: {
+		name: {
 			type: String,
 			default: ''
 		},
-		registration: {
+		division: {
 			type: String,
-			required: true
+			default: null
 		},
-		grades: [gradeSchema]
 	},
-	misc: {
-		tshirts: [tshirtSchema],
+	team: {
+		names: [String],
 		meals: {
 			type: Number,
 			default: 0
 		},
+		tshirts: [tshirtSchema]
 	},
 });
 

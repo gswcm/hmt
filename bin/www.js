@@ -5,7 +5,7 @@
  */
 
 var app = require('../backend/index');
-var debug = require('debug')('jmt:server');
+var debug = require('debug')('hmt:server');
 var http = require('http');
 var mongoose = require('mongoose');
 
@@ -17,7 +17,7 @@ app.set('port', port);
  */
 mongoose.Promise = global.Promise;
 mongoose
-.connect('mongodb://127.0.0.1/junior', {
+.connect('mongodb://127.0.0.1/high', {
 	useMongoClient: true,
 });
 mongoose.connection

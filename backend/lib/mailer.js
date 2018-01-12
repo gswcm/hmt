@@ -26,8 +26,8 @@ const smtpConfig = {
 };
 
 const defaultMailingOptions = {
-	from: 'JMT Mailing Robot <noreply@jmt.gswcm.net>',
-	replyTo: 'noreply@jmt.gswcm.net'
+	from: 'HMT Mailing Robot <noreply@hmt.gswcm.net>',
+	replyTo: 'noreply@hmt.gswcm.net'
 };
 
 const smtpTransport = nodemailer.createTransport(smtpConfig, defaultMailingOptions);
@@ -36,7 +36,7 @@ const base64ToS3_options = {
 		accessKeyId: process.env.S3_KEY,
 		secretAccessKey: process.env.S3_SECRET,
 		params: {
-			Bucket: 'jmt.gswcm.net'
+			Bucket: 'hmt.gswcm.net'
 		}
 	}
 };

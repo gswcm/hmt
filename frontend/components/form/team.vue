@@ -1,9 +1,63 @@
 <template>
-	<fieldset class="mt-3" v-show="showMeals || showTShirts">
+	<fieldset class="mt-3">
 		<legend :class="[status ? '' : 'text-danger']">
-			Miscellaneous
+			The Team
 		</legend>
 		<div class="fieldset p-3 bg-light rounded">
+			<!-- Names -->
+			<b-row align-h="between" align-v="center" class="my-3">
+				<b-col cols="auto">
+					<h5 class="text-info">Members <small v-show="!ro">(see note below)</small></h5>
+				</b-col>
+				<b-col cols="auto" v-show="!ro">
+					<b-btn 
+						variant="outline-info"
+						@click="addName">
+						Add more...
+					</b-btn>
+				</b-col>
+			</b-row>
+			<b-form-group 	
+				v-for="(name,index) in runtime.value.names"
+				:key="`name_${index}`">						
+				<b-row align-v="center">
+					<b-col cols="12" sm="auto">	
+						<label >Student name {{index+1}}</label>
+					</b-col>
+					<b-col col sm>
+						<b-form-input 
+							type="text" 
+							:disabled="ro"
+							:value="name"
+							:state="!/\s*/.test(name) ? null : false"
+							@input="update(['names'],`${index}`,$event)"
+							placeholder="don't leave me empty">
+						</b-form-input>		
+					</b-col>
+					<b-col cols="auto" sm="auto" v-show="!ro">
+						<b-btn 
+							:disabled="runtime.value.names.length < 3"
+							variant="outline-secondary" 
+							@click="removeName(index)">
+							Remove
+						</b-btn>
+					</b-col>
+				</b-row>
+			</b-form-group>
+			<p v-if="!ro" class="mt-3 pl-3 border border-bottom-0 border-top-0 border-right-0 border-dark">
+				<strong>Note</strong>: The team registration cost is calculated based on the number of participants and payment date:
+				<ul>
+					<li>
+						If paid <strong>before December 30<span class="superscript">th</span>, 2017</strong>.
+						The cost is <strong>$75</strong> for the first 8 members and <strong>$5</strong> for each extra participants
+					</li>
+					<li>
+						If paid <strong>after December 30<span class="superscript">th</span>, 2017</strong>.
+						The cost is <strong>$100</strong> for the first 8 members and <strong>$5</strong> for each extra participants
+					</li>
+				</ul>
+				The <strong>Total</strong> below shows both cases.
+			</p>	
 			<!-- T-Shirts -->
 			<b-row align-h="between" align-v="center" class="my-3" v-show="showTShirts">
 				<b-col cols="auto">
@@ -61,7 +115,7 @@
 			</b-form-group>
 			<hr class="my-4" v-show="showTShirts && showMeals">
 			<!-- Meals -->
-			<b-row align-h="between" align-v="center"class="my-3" v-show="showMeals">
+			<b-row align-h="between" align-v="center" class="my-3" v-show="showMeals">
 				<b-col cols="auto">
 					<h5 class="text-info">Meals <small>($7.5 each)</small></h5>
 				</b-col>
@@ -125,6 +179,16 @@
 			}
 		},
 		methods: {
+			removeName(index) {
+				this.runtime.value.names.splice(index,1); 
+				this.runtime.status.names = this.validate('names');
+				this.update();
+			},
+			addName() {
+				this.runtime.value.names.push('');
+				this.runtime.status.names = this.validate('names');
+				this.update();
+			},
 			removeTShirt(index) {
 				this.runtime.value.tshirts.splice(index,1); 
 				this.runtime.status.tshirts = this.validate('tshirts');
@@ -157,6 +221,8 @@
 						return /[0-9]+/.test(subj) && parseInt(subj) >= 0; 
 					case "tshirts":
 						return subj.reduce((a,i) => a && (i.size !== null) && (i.qty > 0), true);
+					case "names":
+						return subj.reduce((a,i) => a && !/\s*/.test(i), true);
 				}
 			},
 			state(isValid) {
