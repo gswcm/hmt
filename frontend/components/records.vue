@@ -242,7 +242,7 @@
 					}
 				}
 				if(this.filter.school.length) {
-					filter.registration["temp.participants.school"] = {
+					filter.registration["temp.school.name"] = {
 						$regex: escapeRegExp(this.filter.school),
 						$options: 'i'
 					}
@@ -250,29 +250,6 @@
 				if(this.filter.confirmed !== null) {
 					filter.registration["main"] = this.filter.confirmed ? { $ne: null} : { $eq: null };
 				}
-				/*
-						paid: {
-							$in: this.filter.paid === null ? [true,false] : [this.filter.paid]
-						},
-						email: {
-							$regex: escapeRegExp(this.filter.email)
-						},
-						"main.sponsor.name": {
-							$regex: escapeRegExp(this.filter.name),
-							$options: 'i'
-						},
-						"main.participants.school": {
-							$regex: escapeRegExp(this.filter.school),
-							$options: 'i'
-						},
-						main: this.filter.confirmed ? 
-							{ $ne: null } : 
-							this.filter.confirmed === false ? 
-								{ $eq: null } : 
-								{ $exists: true }
-					}
-				};
-				*/
 				this.axios.post("/api/admin/records", { filter })
 				.then(response => {
 					if (response.data.status) {

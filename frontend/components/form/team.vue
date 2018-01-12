@@ -29,7 +29,7 @@
 							type="text" 
 							:disabled="ro"
 							:value="name"
-							:state="!/\s*/.test(name) ? null : false"
+							:state="!/^\s*$/.test(name) ? null : false"
 							@input="update(['names'],`${index}`,$event)"
 							placeholder="don't leave me empty">
 						</b-form-input>		
@@ -222,7 +222,7 @@
 					case "tshirts":
 						return subj.reduce((a,i) => a && (i.size !== null) && (i.qty > 0), true);
 					case "names":
-						return subj.reduce((a,i) => a && !/\s*/.test(i), true);
+						return subj.reduce((a,i) => a && !/^\s*$/.test(i), true);
 				}
 			},
 			state(isValid) {

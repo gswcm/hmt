@@ -36,7 +36,7 @@
 					<b-col col sm>
 						<b-select
 							:value="runtime.value.division"
-							:state="runtime.status.division"
+							:state="state(runtime.status.division)"
 							:disabled="ro"
 							@input="update([],'division',$event)">
 							<option :value="null">Please select the school division</option>

@@ -9,16 +9,16 @@
 			:ro="options.ro"
 			@input="update('sponsor', $event)">
 		</sponsor>
-		<participants
-			:value="runtime.value.participants"
+		<school
+			:value="runtime.value.school"
 			:ro="options.ro"
-			@input="update('participants', $event)">
-		</participants>
-		<misc
-			:value="runtime.value.misc"
+			@input="update('school', $event)">
+		</school>
+		<team
+			:value="runtime.value.team"
 			:ro="options.ro"
-			@input="update('misc', $event)">
-		</misc>
+			@input="update('team', $event)">
+		</team>
 		<b-row align-h="end">
 			<b-col cols="auto" >
 				<h2 class="p-3">Total: {{total}}</h2>
@@ -30,11 +30,11 @@
 <script>
 	import { cloneDeep } from 'lodash';
 	import sponsor from './sponsor.vue';
-	import misc from './misc.vue';
-	import participants from './participants.vue';
+	import team from './team.vue';
+	import school from './school.vue';
 	export default {
 		components: {
-			sponsor, misc, participants
+			sponsor, team, school
 		},
 		props: {			
 			value: Object,
@@ -76,22 +76,16 @@
 				this.updateTotal()
 			},
 			updateTotal() {
-				let base = this.runtime.value;
-				let tshirts = base.misc.tshirts.reduce((a,i) => a + parseInt(i.qty), 0) * 10;
-				let meals = parseInt(base.misc.meals) * 7.5;
 				if(this.status) {
-					if(base.participants.registration === "school") {
-						let arr = [50,75].map(i => {
-							return i + meals + tshirts
-						});
-						this.total = `\$${arr[0]} (${arr[1]})`;
-					}
-					else {
-						this.total = `\$${base.participants.grades.reduce((a,i) => a + parseInt(i.qty), 0) * 20 + meals + tshirts}`;
-					}
+					let base = this.runtime.value;
+					let tshirts = base.team.tshirts.reduce((a,i) => a + parseInt(i.qty), 0) * 10;
+					let meals = parseInt(base.team.meals) * 7.5;	
+					let arr = [75,100].map(i => meals + tshirts + ((base.team.names.length < 9) ? i : i + (base.team.names.length - 8) * 5));
+					this.total = `\$${arr[0]} (${arr[1]})`;
 				}
-				else
+				else {
 					this.total = "N/A";
+				}
 			}
 		},
 	}

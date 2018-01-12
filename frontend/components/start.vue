@@ -173,7 +173,9 @@
 						division: null
 					},
 					team: {
-						names: [],
+						names: [
+							''
+						],
 						meals: 0,
 						tshirts: []
 					}
