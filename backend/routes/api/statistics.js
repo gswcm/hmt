@@ -14,7 +14,7 @@ let getSummary = (registrations) => {
 	let summary = {
 		numTeams: registrations.length,
 		numStudents: registrations.reduce((a,i) => a + i.main.team.names.length, 0),
-		numMeals: registrations.reduce((a,i) => a + i.main.misc.meals, 0),
+		numMeals: registrations.reduce((a,i) => a + i.main.team.meals, 0),
 		tshirts: Object.keys(tShirts).length ? tShirts : null
 	};
 	return summary;

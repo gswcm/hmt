@@ -172,7 +172,8 @@ router.post("/admin/records", (req, res) => {
 			let emails = accounts.map(i => i.email);	
 			return Registration.find({
 				$and: [
-					{ email: { $in: emails} },
+					{ email: { $in: emails } },
+					{ temp: { $ne: null } },
 					filter.registration || {}
 				]
 			});

@@ -24,6 +24,28 @@
 					<b-form-group label="<span class='text-info'>School</span> name contains...">
 						<b-form-input :value="filter.school" @input="debounce('school',$event)" type="text" placeholder="part of the school name"></b-form-input>
 					</b-form-group>
+					<!-- Division -->
+					<b-form-group label="School <span class='text-info'>division</span>">
+						<b-select 
+							:value="filter.division" 
+							:state="null"
+							@input="filterUpdated('division',$event)">
+							<option :value="null">--</option>
+							<optgroup label="GISA (private schools)">	
+								<option value="GISA AA">GISA AA</option>
+								<option value="GISA AAA">GISA AAA</option>
+							</optgroup>
+							<optgroup label="GHSA (public schools)">	
+								<option value="GHSA A">GHSA A</option>
+								<option value="GHSA AA">GHSA AA</option>
+								<option value="GHSA AAA">GHSA AAA</option>
+								<option value="GHSA AAAA">GHSA AAAA</option>
+								<option value="GHSA AAAAA">GHSA AAAAA</option>
+								<option value="GHSA AAAAAA">GHSA AAAAAA</option>
+								<option value="GHSA AAAAAAA">GHSA AAAAAAA</option>
+							</optgroup>
+						</b-select>
+					</b-form-group>
 					<hr>
 					<!-- Admin status -->
 					<b-form-group label="Admin status">
@@ -48,10 +70,10 @@
 			<b-col cols="12" sm>
 				<div v-if="options.length" class="mt-3">	
 					<b-alert show variant="info">
-						<!-- Select sponsor's e-mail -->
+						<!-- Select the school -->
 						<b-row align-v="center">
 							<b-col cols="auto">
-								<label><strong>Sponsor's email</strong></label>
+								<label><strong>School</strong></label>
 							</b-col>
 							<b-col col cols>
 								<b-form-select v-model="email" :options="options"/>
@@ -117,7 +139,8 @@
 				confirmed: true,
 				email: '',
 				name: '',
-				school: ''
+				school: '',
+				division: null
 			},
 			email: '',
 		}),
@@ -134,7 +157,10 @@
 				return record.main ? record.main : record.temp;
 			},
 			options() {
-				return this.records.map(i => i.email);
+				return this.records.map(i => ({
+					value: i.email,
+					text: i.temp.school.name
+				}));
 			},
 		},
 		methods: {
@@ -246,6 +272,9 @@
 						$regex: escapeRegExp(this.filter.school),
 						$options: 'i'
 					}
+				}
+				if(this.filter.division !== null) {
+					filter.registration["temp.school.division"] = this.filter.division;
 				}
 				if(this.filter.confirmed !== null) {
 					filter.registration["main"] = this.filter.confirmed ? { $ne: null} : { $eq: null };
