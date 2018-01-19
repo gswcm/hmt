@@ -67,6 +67,11 @@
 									<b-form-radio :value="null">Any</b-form-radio>
 								</b-form-radio-group>
 							</b-form-group>
+							<!-- Refresh -->
+							<b-btn variant="outline-dark" @click="refresh">
+								<i class="fa fa-refresh" aria-hidden="true"></i>
+								Refresh
+							</b-btn>
 						</div>
 					</b-col>
 					<b-col cols="auto" class="d-none d-sm-block px-0 border-left"></b-col>
@@ -135,16 +140,7 @@
 			</b-tab>
 			<!-- Maintenance -->
 			<b-tab title="Maintenance" title-item-class="ml-auto">
-				<b-alert show dismissible variant="danger" class="mt-3">
-					This interface is intended for direct manipulation of selected database fileds. Use with caution. 
-				</b-alert>
-				<!-- Resequence registrations -->
-				<h4>Re-sequencing registrations</h4>
-				<p>
-					All registration records are assigned with unique numbers that constitute part of the registration ID. Any given registration is associated with a 2-digits number. Re-sequencing process sorts all registrations by e-mail and assigns sequence numbers starting from "00".					
-				</p>
-				<b-btn variant="outline-danger" @click="reSequence">Re-sequence</b-btn>
-				<hr>
+				<maintenance :credentials="credentials"/>
 			</b-tab>
 		</b-tabs>
 	</div>
@@ -153,10 +149,11 @@
 <script>
 	import { debounce, escapeRegExp } from 'lodash';
 	import registration from './form/registration.vue';
+	import maintenance from './maintenance.vue';
 	import jsPDF from 'jspdf';
 	export default {
 		components: {
-			registration
+			registration, maintenance
 		},
 		props: {
 			credentials: Object
@@ -194,28 +191,7 @@
 				}));
 			},
 		},
-		methods: {
-			reSequence() {
-				this.axios.post("/api/mtn/reseq", {
-					credentials: this.credentials
-				})
-				.then(response => {
-					if (response.data.status) {
-						//-- server error
-						let error = response.data.error || new Error("not sure");
-						throw error;
-					} 
-					else {
-						this.$noty.success(`Registrations have been re-sequenced`);
-					}
-				})
-				.catch(error => {
-					this.$noty.error(
-						`Something went wrong... more specifically: ${error.message}`
-					);
-					console.error(error.stack);
-				});
-			},
+		methods: {			
 			printRecord() {
 				let doc = new jsPDF({
 					orientation: 'p',

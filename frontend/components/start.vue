@@ -157,6 +157,7 @@
 					email = email.toLowerCase();
 					if(email !== this.email) {
 						this.$store.commit(types.SET_EMAIL, email);
+						this.$store.commit(types.SET_IS_ADMIN, false);
 						this.showForm = false;
 						this.uuid = '';	
 						this.override = false;
@@ -169,6 +170,11 @@
 				}
 			},
 			emailEval() {
+				//-- Shortcut for clicking Admin link -- second submission of the form
+				if(this.isAdmin) {
+					this.$router.push('/admin');
+					return;
+				}
 				//-- Defaults				
 				this.registration.value = {
 					sponsor: {

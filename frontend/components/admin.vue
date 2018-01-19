@@ -21,7 +21,7 @@
 							</b-col>
 							<b-col col sm>
 								<b-input-group>
-									<b-form-input type="password" class="border-right-0" @input="credentialChecker('password',$event)" placeholder="admin's password">
+									<b-form-input type="password" ref="password" class="border-right-0" @input="credentialChecker('password',$event)" placeholder="admin's password">
 									</b-form-input>
 									<b-input-group-button slot="right">
 										<b-btn :disabled="!emailIsValid" variant="outline-dark" class="border-left-0" v-b-modal.passwordRecovery>forgotten...</b-btn>
@@ -66,6 +66,9 @@ export default {
 	created() {
 		this.credentials.email = this.email;
 		this.credentialChecker();
+	},
+	mounted() {
+		this.$nextTick(() => this.$refs.password.focus());
 	},
 	beforeRouteEnter(to, from, next) {
 		next(vm => {
