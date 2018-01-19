@@ -102,7 +102,7 @@
 										</b-btn>
 									</b-col>
 									<b-col cols="auto" class="pl-0">
-										<b-btn variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printRecord">
+										<b-btn variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printRecord(reg)">
 											<i class="fa fa-download" aria-hidden="true"></i>
 										</b-btn>
 									</b-col>
@@ -124,7 +124,7 @@
 									Payment status
 								</b-form-checkbox>
 							</b-alert>
-							<registration v-if="reg !== null" :value="reg" :options="{ debug: false, ro: true }"/>					
+							<registration v-if="reg.temp !== null" :value="reg.temp" :options="{ debug: false, ro: true }"/>					
 						</div>
 						<b-alert v-else show variant="warning">
 							<h5>No records found</h5>
@@ -151,6 +151,7 @@
 	import registration from './form/registration.vue';
 	import maintenance from './maintenance.vue';
 	import jsPDF from 'jspdf';
+	import { sprintf }  from 'sprintf-js'; 
 	export default {
 		components: {
 			registration, maintenance
@@ -181,8 +182,7 @@
 				return record ? record.paid : false;
 			},
 			reg() {
-				let record = this.records.find(i => i.email === this.email);
-				return record.main ? record.main : record.temp;
+				return this.records.find(i => i.email === this.email);
 			},
 			options() {
 				return this.records.map(i => ({
@@ -192,21 +192,39 @@
 			},
 		},
 		methods: {			
-			printRecord() {
+			printRecord(reg) {
 				let doc = new jsPDF({
 					orientation: 'p',
 					unit: 'mm',
 					format: [279.4,152.4]
 				});				
+				doc.setFontSize(12);
+				//-- Test pattern, not to be printed in production
+				/*
 				for(let x=0; x<10; x++) {
 					for(let y=0; y<10; y++) {
 						// HP_M401dw
 						doc.rect(58.5 + x * 4.2 + 0.6, 10.2 + y * 4.2 + 1.4, 2.9, 1.4, 'F');		
 					}
 				}
-				doc.setFontSize(12);
 				doc.text('Simon Baev | Georgia Southwestern State University', 72, 200, {}, 90);
 				doc.save('test.pdf');
+				*/
+				let studentIndex = 0;
+				let schoolName = reg.temp.school.name;
+				for(let s of reg.temp.team.names) {
+					let id = sprintf("%s%02d", reg.seq, studentIndex++);	
+					doc.text(`${s} | ${schoolName}`, 72, 200, {}, 90);
+					let colIndex = 0;
+					for(let c of id.split("")) {
+						let i = parseInt(c);
+						doc.rect(58.5 + colIndex++ * 4.2 + 0.6, 10.2 + i * 4.2 + 1.4, 2.9, 1.4, 'F');		
+					}
+					if(studentIndex < reg.temp.team.names.length) {
+						doc.addPage();
+					}
+				}
+				doc.save(`${reg.temp.school.division.replace(/\s+/g,'_')}_${reg.seq}_${reg.temp.school.name.replace(/\s+/g,'')}.pdf`);
 			},
 			onCopy() {
 				this.$noty.success(`E-mail copied into clipboard`);
@@ -359,6 +377,9 @@
 	}
 	hr {
 		border: 1px solid black;
+	}
+	.nav-tabs:focus {
+		outline: none;
 	}
 </style>
 

@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<b-alert show dismissible variant="danger" class="mt-3">
+	<div class="mt-3 p-3">
+		<b-alert show dismissible variant="danger">
 			This interface is intended for direct manipulation of selected database fileds. Use with caution. 
 		</b-alert>
 		<!-- Resequence registrations -->

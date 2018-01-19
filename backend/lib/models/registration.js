@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const sprintf = require('sprintf-js').sprintf;
 
 function capitalize(s) {
-	return s.trim().toLowerCase().split(/\s+/g).map(i => {
+	s = s.trim();
+	return (s.length ? s : '--').toLowerCase().split(/\s+/g).map(i => {
 		return i[0].toUpperCase() + i.substr(1);
 	}).join(' ');
 }
@@ -86,6 +87,9 @@ const registrationSchema = mongoose
 		for(let key of ['main','temp']) {
 			if(this[key] && this[key].school.name) {
 				this[key].school.name = capitalize(this[key].school.name);
+				this[key].team.names = this[key].team.names.map((name) => {
+					return capitalize(name.replace(/\s+/g,' '));
+				});
 			}
 		}
 		next();
