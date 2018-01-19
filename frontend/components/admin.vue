@@ -1,36 +1,38 @@
 <template>
 	<b-container fluid v-if="isAdmin">
-		<b-form-group :class="['login', 'my-3', 'p-3', 'bg-warning', 'rounded']">
-			<b-row>
-				<b-col cols="12" md>
-					<b-row align-v="center" class="my-2">
-						<b-col cols="12" sm="3" md="auto">
-							<label><strong>E-mail</strong></label>
-						</b-col>
-						<b-col col sm>
-							<b-form-input type="text" @input="credentialChecker('email',$event)" :value="email || ''" placeholder="admin's e-mail">
-							</b-form-input>
-						</b-col>
-					</b-row>
-				</b-col>
-				<b-col cols="12" md>
-					<b-row align-v="center" class="my-2">
-						<b-col cols="12" sm="3" md="auto">
-							<label><strong>Password</strong></label>
-						</b-col>
-						<b-col col sm>
-							<b-input-group>
-								<b-form-input type="password" class="border-right-0" @input="credentialChecker('password',$event)" placeholder="admin's password">
+		<b-form @submit.prevent="credentialChecker">
+			<b-form-group :class="['login', 'my-3', 'p-3', 'bg-warning', 'rounded']">
+				<b-row>
+					<b-col cols="12" md>
+						<b-row align-v="center" class="my-2">
+							<b-col cols="12" sm="3" md="auto">
+								<label><strong>E-mail</strong></label>
+							</b-col>
+							<b-col col sm>
+								<b-form-input type="text" @input="credentialChecker('email',$event)" :value="email || ''" placeholder="admin's e-mail">
 								</b-form-input>
-								<b-input-group-button slot="right">
-									<b-btn :disabled="!emailIsValid" variant="outline-dark" class="border-left-0" v-b-modal.passwordRecovery>forgotten...</b-btn>
-								</b-input-group-button>
-							</b-input-group>
-						</b-col>
-					</b-row>
-				</b-col>
-			</b-row>
-		</b-form-group>
+							</b-col>
+						</b-row>
+					</b-col>
+					<b-col cols="12" md>
+						<b-row align-v="center" class="my-2">
+							<b-col cols="12" sm="3" md="auto">
+								<label><strong>Password</strong></label>
+							</b-col>
+							<b-col col sm>
+								<b-input-group>
+									<b-form-input type="password" class="border-right-0" @input="credentialChecker('password',$event)" placeholder="admin's password">
+									</b-form-input>
+									<b-input-group-button slot="right">
+										<b-btn :disabled="!emailIsValid" variant="outline-dark" class="border-left-0" v-b-modal.passwordRecovery>forgotten...</b-btn>
+									</b-input-group-button>
+								</b-input-group>
+							</b-col>
+						</b-row>
+					</b-col>
+				</b-row>
+			</b-form-group>
+		</b-form>
 		<b-modal id="passwordRecovery" title="Forgotten your password?" ok-title="Confirm" cancel-title="Close" @ok="sendRecoveryEmail">
 			<p>
 				We will send an e-mail with password recovery link to <strong>{{credentials.email}}</strong>. Please confirm your will or close this dialog to cancel recovery process.

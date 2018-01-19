@@ -5,33 +5,36 @@
 				Who are you?
 			</legend>
 			<div class="fieldset p-3 bg-light rounded">
-				<b-form-group 			
-					class="my-0"							
-					label-for="email"
-					:feedback="emailFeedback"
-					:state="emailState">
-					<b-row align-v="center">
-						<b-col cols="12" sm="auto">	
-							<label>Sponsor's e-mail</label>
-						</b-col>
-						<b-col col sm>
-							<b-input-group @keyup.enter="keyup">
-								<b-form-input 
-									id="email" 
-									type="text" 
-									:state="emailState"
-									:value="email"
-									@input="emailUpdated"
-									placeholder="just start typing...">
-								</b-form-input>
-							</b-input-group>							
-						</b-col>
-						<b-col v-if="emailIsValid" class="pl-0" cols="auto">
-							<b-btn variant="primary" @click="emailEval">Go!</b-btn>
-						</b-col>
-					</b-row>
-					<div slot="feedback" class="d-flex justify-content-end mt-2">{{emailFeedback}}</div>
-				</b-form-group>
+				<b-form @submit.prevent="emailEval">
+					<b-form-group 			
+						class="my-0"							
+						label-for="email"
+						:feedback="emailFeedback"
+						:state="emailState">
+						<b-row align-v="center">
+							<b-col cols="12" sm="auto">	
+								<label>Sponsor's e-mail</label>
+							</b-col>
+							<b-col col sm>
+								<b-input-group>
+									<b-form-input 
+										id="email" 
+										type="text" 
+										:state="emailState"
+										:value="email"
+										ref="email"
+										@input="emailUpdated"
+										placeholder="just start typing...">
+									</b-form-input>
+								</b-input-group>							
+							</b-col>
+							<b-col v-if="emailIsValid" class="pl-0" cols="auto">
+								<b-btn type="submit" variant="primary">Go!</b-btn>
+							</b-col>
+						</b-row>
+						<div slot="feedback" class="d-flex justify-content-end mt-2">{{emailFeedback}}</div>
+					</b-form-group>
+				</b-form>
 			</div>
 		</fieldset>
 		<!-- <div  class="bg-warning p-3 rounded my-3"> -->
@@ -61,12 +64,13 @@
 				<p>
 					Please have in mind that confirmation <strong>e-mail will expire in 1 day</strong> after creation.
 				</p>
+				<!-- <button class="btn btn-primary" :disabled="!registration.status">Booo</button> -->
 				<invisible-recaptcha 
-					:disabled="!registration.status"
 					id="recaptcha"
 					class="btn btn-primary"
 					theme="light"
 					:sitekey="reCAPTCHA_sitekey" 
+					:disabled="!registration.status"
 					:callback="submit">
 					{{!uuid.length ? 'Submit' : 'Update'}}
 				</invisible-recaptcha>
@@ -90,7 +94,7 @@
 		data: () => ({
 			registration: {
 				value: {},
-				status: false
+				status: null
 			},
 			showForm: false,
 			popupIndex: 0,
@@ -99,7 +103,10 @@
 			reCAPTCHA_sitekey: ''
 		}),
 		created() {
-			this.emailUpdated(this.email);
+			this.emailUpdated(this.email);			
+		},
+		mounted() {
+			this.$nextTick(() => this.$refs.email.focus());
 		},
 		computed: {
 			...mapGetters({
@@ -120,7 +127,7 @@
 		methods: {
 			update(data) {
 				this.registration.value = data.value;
-				this.registration.status = data.status;
+				this.registration.status = data.status
 			},
 			submit(response) {
 				this.axios.post('/api/start/set', {
@@ -154,7 +161,7 @@
 						this.uuid = '';	
 						this.override = false;
 					}
-				}, 500
+				}, 100
 			),
 			keyup(e) {
 				if(this.emailIsValid) {

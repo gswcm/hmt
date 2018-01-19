@@ -4,6 +4,7 @@ const errToJSON = require("error-to-json");
 const router = express.Router();
 const Account = require("../../lib/models/account");
 const Registration = require("../../lib/models/registration");
+const Counter = require("../../lib/models/counter");
 const Token = require("../../lib/models/token");
 const smtpTransport = require("../../lib/mailer");
 const emailTemplates = require("email-templates");
@@ -181,7 +182,7 @@ router.post("/admin/records", (req, res) => {
 		.then(records => {
 			return res.json({
 				status: 0,
-				records: records.map(i => _.pick(i, ["email", "paid", "temp", "main"]))
+				records: records.map(i => _.pick(i, ["email", "paid", "temp", "main", "seq"]))
 			});
 		})
 		.catch(error => {
@@ -234,5 +235,6 @@ router.post("/admin/eval", (req, res) => {
 		});
 	});
 });
+
 
 module.exports = router;
