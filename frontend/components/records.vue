@@ -5,7 +5,7 @@
 			<b-tab title="Registrations" active>
 				<b-row class="p-4">
 					<b-col cols="12" sm="auto">
-						<h4>Filters</h4>
+						<h4 class="my-3">Filters</h4>
 						<div class="bg-light px-3 py-1 mt-1 rounded">
 							<!-- Payment status -->
 							<b-form-group label="Payment status">
@@ -67,10 +67,17 @@
 									<b-form-radio :value="null">Any</b-form-radio>
 								</b-form-radio-group>
 							</b-form-group>
+						</div>
+						<div class="mt-3">
 							<!-- Refresh -->
 							<b-btn variant="outline-dark" @click="refresh">
 								<i class="fa fa-refresh" aria-hidden="true"></i>
 								Refresh
+							</b-btn>
+							<!-- Save all -->
+							<b-btn variant="outline-dark" class="ml-3" @click="printMany">
+								<i class="fa fa-download" aria-hidden="true"></i>
+								Save all
 							</b-btn>
 						</div>
 					</b-col>
@@ -102,7 +109,7 @@
 										</b-btn>
 									</b-col>
 									<b-col cols="auto" class="pl-0">
-										<b-btn variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printRecord(reg)">
+										<b-btn variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printOne(reg)">
 											<i class="fa fa-download" aria-hidden="true"></i>
 										</b-btn>
 									</b-col>
@@ -124,7 +131,7 @@
 									Payment status
 								</b-form-checkbox>
 							</b-alert>
-							<registration v-if="reg.temp !== null" :value="reg.temp" :options="{ debug: false, ro: true }"/>					
+							<registration v-if="reg_filtered !== null" :value="reg_filtered" :options="{ debug: false, ro: true }"/>					
 						</div>
 						<b-alert v-else show variant="warning">
 							<h5>No records found</h5>
@@ -184,21 +191,35 @@
 			reg() {
 				return this.records.find(i => i.email === this.email);
 			},
+			reg_filtered() {
+				return (this.filter.confirmed && this.reg.main) ? this.reg.main : (this.reg.temp ? this.reg.temp : null);
+			},
 			options() {
-				return this.records.map(i => ({
-					value: i.email,
-					text: i.temp.school.name
-				}));
+				return this.records.map(i => {
+					let rec = (this.filter.confirmed && i.main) ? i.main : i.temp;
+					return {
+						value: i.email,
+						text: `${rec.school.name} (${rec.team.names.length})`
+					};
+				});
 			},
 		},
-		methods: {			
-			printRecord(reg) {
-				let doc = new jsPDF({
-					orientation: 'p',
-					unit: 'mm',
-					format: [279.4,152.4]
-				});				
-				doc.setFontSize(12);
+		methods: {
+			printMany() {
+				this.records.reduce((a,i) => this.printOne(i, false, a), null).save('bulk.pdf');
+			},			
+			printOne(reg, output = true, doc = null) {
+				if(doc) {
+					doc.addPage();
+				}
+				else {
+					doc = new jsPDF({
+						orientation: 'p',
+						unit: 'mm',
+						format: [279.4,152.4]
+					});				
+					doc.setFontSize(12);
+				}
 				//-- Test pattern, not to be printed in production
 				/*
 				for(let x=0; x<10; x++) {
@@ -211,20 +232,27 @@
 				doc.save('test.pdf');
 				*/
 				let studentIndex = 0;
-				let schoolName = reg.temp.school.name;
-				for(let s of reg.temp.team.names) {
-					let id = sprintf("%s%02d", reg.seq, studentIndex++);	
+				let seq = reg.seq;
+				let rec = (this.filter.confirmed && reg.main) ? reg.main : reg.temp;
+				let schoolName = rec.school.name;
+				for(let s of rec.team.names) {
+					let id = sprintf("%s%02d", seq, studentIndex++);	
 					doc.text(`${s} | ${schoolName}`, 72, 200, {}, 90);
 					let colIndex = 0;
 					for(let c of id.split("")) {
 						let i = parseInt(c);
 						doc.rect(58.5 + colIndex++ * 4.2 + 0.6, 10.2 + i * 4.2 + 1.4, 2.9, 1.4, 'F');		
 					}
-					if(studentIndex < reg.temp.team.names.length) {
+					if(studentIndex < rec.team.names.length) {
 						doc.addPage();
 					}
 				}
-				doc.save(`${reg.temp.school.division.replace(/\s+/g,'_')}_${reg.seq}_${reg.temp.school.name.replace(/\s+/g,'')}.pdf`);
+				if(output) {
+					doc.save(`${rec.school.division.replace(/\s+/g,'_')}_${seq}_${rec.school.name.replace(/\s+/g,'')}.pdf`);
+				}
+				else {
+					return doc;
+				}
 			},
 			onCopy() {
 				this.$noty.success(`E-mail copied into clipboard`);
