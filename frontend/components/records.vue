@@ -4,7 +4,7 @@
 			<!-- Registrations: view and print -->
 			<b-tab title="Registrations" active>
 				<b-row class="p-4">
-					<b-col cols="12" sm="auto">
+					<b-col cols="12" md="auto">
 						<h4 class="my-3">Filters</h4>
 						<div class="bg-light px-3 py-1 mt-1 rounded">
 							<!-- Payment status -->
@@ -81,38 +81,39 @@
 							</b-btn>
 						</div>
 					</b-col>
-					<b-col cols="auto" class="d-none d-sm-block px-0 border-left"></b-col>
-					<b-col cols="12" sm>
+					<b-col cols="auto" class="d-none d-md-block px-0 border-left"></b-col>
+					<b-col cols="12" md>
 						<div v-if="options.length" class="mt-3">	
 							<b-alert show variant="info">
 								<!-- Select the school -->
 								<b-row align-v="center">
-									<b-col cols="12" sm="auto">
+									<b-col cols="3" sm="auto" md="3" lg="auto">
 										<label><strong>School</strong></label>
 									</b-col>
-									<b-col col cols>
+									<b-col cols="9" sm="" md="9" lg="" class="pl-0">
 										<b-form-select v-model="email" :options="options"/>
-									</b-col>	
-									<b-col cols="auto" class="pl-0">
-										<b-btn variant="outline-dark" v-b-modal.confirmRegistration v-b-tooltip.hover title="Confirm registration">
+									</b-col>
+									<b-col cols="12" class="d-sm-none d-md-block d-lg-none py-1"></b-col>
+									<b-col cols="auto" sm="auto" class="pl-0 order-3 order-md-3 order-sm-2 order-lg-2 ml-auto ml-sm-0 ml-md-auto ml-lg-0">
+										<b-btn class="" variant="outline-dark" v-b-modal.confirmRegistration v-b-tooltip.hover title="Confirm registration">
 											<i class="fa fa-check" aria-hidden="true"></i>
 										</b-btn>
-									</b-col>
-									<b-col cols="auto" class="pl-0">
-										<b-btn variant="outline-dark" v-b-modal.removeRecord v-b-tooltip.hover title="Remove registration record">
+										<b-btn class="" variant="outline-dark" v-b-modal.removeRecord v-b-tooltip.hover title="Remove registration record">
 											<i class="fa fa-trash" aria-hidden="true"></i>
 										</b-btn>
-									</b-col>
-									<b-col cols="auto" class="pl-0">
-										<b-btn variant="outline-dark" v-clipboard:copy="email" v-clipboard:success="onCopy" v-b-tooltip.hover title="Copy email to clipboard">
+										<b-btn class="" variant="outline-dark" v-clipboard:copy="email" v-clipboard:success="onCopy" v-b-tooltip.hover title="Copy email to clipboard">
 											<i class="fa fa-clipboard" aria-hidden="true"></i>
 										</b-btn>
-									</b-col>
-									<b-col cols="auto" class="pl-0">
-										<b-btn variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printOne(reg)">
+										<b-btn class="" variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printOne(reg)">
 											<i class="fa fa-download" aria-hidden="true"></i>
 										</b-btn>
 									</b-col>
+									<b-col cols="5" sm="12" md="4" lg="12" class="order-2 order-md-2 order-sm-3 order-lg-3">
+										<!-- Change payment status -->
+										<b-form-checkbox class="mt-3 ml-auto" :checked="paid" @change="paidUpdated">
+											Payment <span class="d-none d-sm-inline-block d-md-none d-lg-inline-block">status</span>
+										</b-form-checkbox>
+									</b-col>	
 								</b-row>
 								<!-- Confirm removal -->
 								<b-modal id="removeRecord" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="removeRecord">
@@ -126,10 +127,6 @@
 										You are about confirm temporal registration for <strong>{{email}}</strong>. Please confirm your will or close this dialog to cancel.
 									</p>
 								</b-modal>
-								<!-- Change payment status -->
-								<b-form-checkbox class="mt-3" :checked="paid" @change="paidUpdated">
-									Payment status
-								</b-form-checkbox>
 							</b-alert>
 							<registration v-if="reg_filtered !== null" :value="reg_filtered" :options="{ debug: false, ro: true }"/>					
 						</div>
@@ -141,6 +138,55 @@
 			</b-tab>
 			<!-- Questions: edit -->
 			<b-tab title="Questions">
+				<div class="p-4">
+					<p>Specify category and a correct answer for each question. Then save changes if any.</p>
+					<b-row class="p-3">
+						<template v-for="g in Array.from(Array(2).keys())">
+							<b-col cols="12" md="10" lg="8" xl="" :key="`g_${g}`" :class="['bg-light', 'border','p-3','mx-2']">
+								<div v-for="q in Array.from(Array(20).keys())" :key="`q_${q}`">
+									<b-row :class="!(Q[g*20+q].cat && Q[g*20+q].key) ? 'text-danger' : 'text-default'">
+										<b-col cols="1"><strong>{{g*20+q+1}}</strong></b-col>
+										<b-col cols="">
+											<b-form-select v-model="Q[g*20+q].cat">
+												<option :value="null">--</option>
+												<option value="ALGE">Algebra</option>
+												<option value="ANGE">Analytical geometry</option>
+												<option value="GEOM">Geometry</option>
+												<option value="TRIG">Trigonometry</option>
+												<option value="MISC">Miscellaneous</option>
+											</b-form-select>
+										</b-col>
+										<b-col cols="3" class="d-block d-md-none">
+											<b-form-select v-model="Q[g*20+q].key">
+												<option :value="null">--</option>
+												<option :value="1">1</option>
+												<option :value="2">2</option>
+												<option :value="3">3</option>
+												<option :value="4">4</option>
+												<option :value="5">5</option>
+											</b-form-select>
+										</b-col>
+										<b-col sm="auto" class="d-none d-md-block">	
+											<b-form-radio-group v-model="Q[g*20+q].key">
+												<b-form-radio :value="1">1</b-form-radio>
+												<b-form-radio :value="2">2</b-form-radio>
+												<b-form-radio :value="3">3</b-form-radio>
+												<b-form-radio :value="4">4</b-form-radio>
+												<b-form-radio :value="5">5</b-form-radio>
+											</b-form-radio-group>
+										</b-col>
+									</b-row>
+								</div>
+							</b-col>
+							<!-- <b-col cols="auto" class="d-none d-sm-block px-0 border-left" :key="`b_${g}`"></b-col>							 -->
+						</template>
+					</b-row>
+					<div class="p-3">
+						<b-btn :disabled="!questionsValid" class="ml-auto d-block" variant="primary">
+							Save
+						</b-btn>
+					</div>
+				</div>
 			</b-tab>
 			<!-- Evaluation: integration with scantron -->
 			<b-tab title="Evaluation" disabled>
@@ -177,13 +223,19 @@
 				school: '',
 				division: null
 			},
+			Q: [],
 			email: '',
 			showMaintenance: false
 		}),
 		created() {
 			this.refresh();
+			this.Q = Array.apply(null, Array(40)).map(i => ({cat:null,key:null}));
+
 		},
 		computed: {
+			questionsValid() {
+				return this.Q.reduce((a,i) => a && i.cat && i.key, true)
+			},
 			paid() {
 				let record = this.records.find(i => i.email === this.email);
 				return record ? record.paid : false;
