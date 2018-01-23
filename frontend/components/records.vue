@@ -138,7 +138,7 @@
 			</b-tab>
 			<!-- Questions: edit -->
 			<b-tab title="Questions">
-				<div class="p-4">
+				<div v-if="Q.length" class="p-4">
 					<p>Specify category and a correct answer for each question. Then save changes if any.</p>
 					<b-row class="p-3">
 						<template v-for="g in Array.from(Array(2).keys())">
@@ -178,11 +178,10 @@
 									</b-row>
 								</div>
 							</b-col>
-							<!-- <b-col cols="auto" class="d-none d-sm-block px-0 border-left" :key="`b_${g}`"></b-col>							 -->
 						</template>
 					</b-row>
 					<div class="p-3">
-						<b-btn :disabled="!questionsValid" class="ml-auto d-block" variant="primary">
+						<b-btn :disabled="!questionsValid && false" class="ml-auto d-block" variant="primary" @click="saveQuestions">
 							Save
 						</b-btn>
 					</div>
@@ -229,8 +228,7 @@
 		}),
 		created() {
 			this.refresh();
-			this.Q = Array.apply(null, Array(40)).map(i => ({cat:null,key:null}));
-
+			this.getQuestions();
 		},
 		computed: {
 			questionsValid() {
@@ -257,6 +255,49 @@
 			},
 		},
 		methods: {
+			getQuestions() {
+				this.axios.post("/api/Q", {
+					credentials: this.credentials
+				})
+				.then(response => {
+					if (response.data.status) {
+						//-- server error
+						let error = response.data.error || new Error("not sure");
+						throw error;
+					} 
+					else {
+						this.Q = response.data.questions;
+					}
+				})
+				.catch(error => {
+					this.$noty.error(
+						`Something went wrong... more specifically: ${error.message}`
+					);
+					console.error(error.stack);
+				});
+			},
+			saveQuestions() {
+				this.axios.post("/api/Q", {
+					questions: this.Q,
+					credentials: this.credentials
+				})
+				.then(response => {
+					if (response.data.status) {
+						//-- server error
+						let error = response.data.error || new Error("not sure");
+						throw error;
+					} 
+					else {
+						this.$noty.success(`Questions updated`);
+					}
+				})
+				.catch(error => {
+					this.$noty.error(
+						`Something went wrong... more specifically: ${error.message}`
+					);
+					console.error(error.stack);
+				});
+			},
 			printMany() {
 				this.records.reduce((a,i) => this.printOne(i, false, a), null).save('bulk.pdf');
 			},			

@@ -4,36 +4,11 @@ const errToJSON = require("error-to-json");
 const router = express.Router();
 const Account = require("../../lib/models/account");
 const Registration = require("../../lib/models/registration");
-const Counter = require("../../lib/models/counter");
 const Token = require("../../lib/models/token");
 const smtpTransport = require("../../lib/mailer");
 const emailTemplates = require("email-templates");
 const path = require("path");
-
-let evalCredentials = credentials => {
-	let email = credentials.email;
-	let password = credentials.password;
-	return Account.findOne({ email })
-	.then(account => {
-		if (account) {
-			return account.checkPassword(password)
-			.then(result => {
-				return result
-					? Promise.resolve(account)
-					: Promise.reject(new Error("Incorrect credentials"));
-			});
-		} 
-		else {
-			return Promise.reject(new Error("Incorrect credentials"));
-		}
-	})
-	.then(account => {
-		if (!account.admin) {
-			return Promise.reject(new Error("User is not an admin"));
-		}
-		return Promise.resolve();
-	});
-};
+const evalCredentials = require("../../lib/utils").evalCredentials;
 
 router.post("/admin/password/update", (req, res) => {
 	let email = req.body.email;
