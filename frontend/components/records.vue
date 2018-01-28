@@ -181,7 +181,7 @@
 						</template>
 					</b-row>
 					<div class="p-3">
-						<b-btn :disabled="!questionsValid" class="ml-auto d-block" variant="primary" @click="saveQuestions">
+						<b-btn class="ml-auto d-block" variant="primary" @click="saveQuestions">
 							Save
 						</b-btn>
 					</div>
