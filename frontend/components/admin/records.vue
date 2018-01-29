@@ -67,12 +67,14 @@
 			<div class="mt-3">
 				<!-- Refresh -->
 				<b-btn variant="outline-dark" @click="refresh">
-					<i class="fa fa-refresh" aria-hidden="true"></i>
+					<!-- <i class="fa fa-refresh" aria-hidden="true"></i> -->
+					<font-awesome-icon :icon="['fas', 'sync-alt']"/>
 					Refresh
 				</b-btn>
 				<!-- Download all -->
 				<b-btn variant="outline-dark" class="ml-3" @click="printMany">
-					<i class="fa fa-download" aria-hidden="true"></i>
+					<!-- <i class="fa fa-download" aria-hidden="true"></i> -->
+					<font-awesome-icon :icon="['fas', 'download']"/>
 					Download all
 				</b-btn>
 			</div>
@@ -92,16 +94,20 @@
 						<b-col cols="12" class="d-sm-none d-md-block d-lg-none py-1"></b-col>
 						<b-col cols="auto" sm="auto" class="pl-0 order-3 order-md-3 order-sm-2 order-lg-2 ml-auto ml-sm-0 ml-md-auto ml-lg-0">
 							<b-btn class="" variant="outline-dark" v-b-modal.confirmRegistration v-b-tooltip.hover title="Confirm registration">
-								<i class="fa fa-check" aria-hidden="true"></i>
+								<!-- <i class="fa fa-check" aria-hidden="true"></i> -->
+								<font-awesome-icon :icon="['fas', 'check']"/>
 							</b-btn>
 							<b-btn class="" variant="outline-dark" v-b-modal.removeRecord v-b-tooltip.hover title="Remove registration record">
-								<i class="fa fa-trash" aria-hidden="true"></i>
+								<!-- <i class="fa fa-trash" aria-hidden="true"></i> -->
+								<font-awesome-icon :icon="['fas', 'trash-alt']"/>
 							</b-btn>
 							<b-btn class="" variant="outline-dark" v-clipboard:copy="email" v-clipboard:success="onCopy" v-b-tooltip.hover title="Copy email to clipboard">
-								<i class="fa fa-clipboard" aria-hidden="true"></i>
+								<!-- <i class="fa fa-clipboard" aria-hidden="true"></i> -->
+								<font-awesome-icon :icon="['fas', 'copy']"/>
 							</b-btn>
 							<b-btn class="" variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printOne(reg)">
-								<i class="fa fa-download" aria-hidden="true"></i>
+								<!-- <i class="fa fa-download" aria-hidden="true"></i> -->
+								<font-awesome-icon :icon="['fas', 'download']"/>
 							</b-btn>
 						</b-col>
 						<b-col cols="5" sm="12" md="4" lg="12" class="order-2 order-md-2 order-sm-3 order-lg-3">

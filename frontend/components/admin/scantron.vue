@@ -6,12 +6,14 @@
 			</b-col>
 			<b-col cols="auto" class="d-none d-sm-flex flex-column justify-content-center">
 				<b-btn variant="outline-dark" @click="scanToEval">
-					<i class="fa fa-chevron-right" aria-hidden="true"></i>
+					<!-- <i class="fa fa-chevron-right" aria-hidden="true"></i> -->
+					<font-awesome-icon :icon="['fas', 'angle-double-right']"/>
 				</b-btn>
 			</b-col>
 			<b-col cols="12" class="d-block d-sm-none my-3">
 				<b-btn class="mx-auto d-block" variant="outline-dark" @click="scanToEval">
-					<i class="fa fa-chevron-down" aria-hidden="true"></i>
+					<!-- <i class="fa fa-chevron-down" aria-hidden="true"></i> -->
+					<font-awesome-icon :icon="['fas', 'angle-double-down']"/>
 				</b-btn>
 			</b-col>
 			<b-col cols="12" sm="" class="" >
@@ -20,15 +22,18 @@
 		</b-row>
 		<div class="mt-3 d-flex justify-content-end">
 			<b-btn variant="outline-dark" @click="evalProcess">
-				<i class="fa fa-question" aria-hidden="true"></i>
+				<!-- <i class="fa fa-question" aria-hidden="true"></i> -->
+				<font-awesome-icon :icon="['fas', 'question-circle']"/>
 				Test
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3">
-				<i class="fa fa-floppy-o" aria-hidden="true"></i>
+				<!-- <i class="fa fa-floppy-o" aria-hidden="true"></i> -->
+				<font-awesome-icon :icon="['fas', 'save']"/>
 				Save
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3" @click="evalData = []">
-				<i class="fa fa-trash-o" aria-hidden="true"></i>
+				<!-- <i class="fa fa-trash-o" aria-hidden="true"></i> -->
+				<font-awesome-icon :icon="['fas', 'trash-alt']"/>
 				Clear
 			</b-btn>
 		</div>
@@ -44,7 +49,7 @@ export default {
 		runtime: {
 			credentials: {}
 		},
-		scanData: ["100500","","1234JKGJG","123JHGJG","00010897348"],
+		scanData: ["100500","1234JKGJG"],
 		evalData: [],
 	}),
 	created() {
