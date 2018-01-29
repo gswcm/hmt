@@ -74,10 +74,10 @@
 								<i class="fa fa-refresh" aria-hidden="true"></i>
 								Refresh
 							</b-btn>
-							<!-- Save all -->
+							<!-- Download all -->
 							<b-btn variant="outline-dark" class="ml-3" @click="printMany">
 								<i class="fa fa-download" aria-hidden="true"></i>
-								Save all
+								Download all
 							</b-btn>
 						</div>
 					</b-col>
@@ -139,7 +139,7 @@
 			<!-- Questions: edit -->
 			<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs.</span>">
 				<div v-if="Q.length" class="p-4">
-					<p>Specify category and a correct answer for each question. Then save changes if any.</p>
+					<p>Specify category and a correct answer for each question. All changes are saved automatically.</p>
 					<b-row class="p-3">
 						<template v-for="g in Array.from(Array(2).keys())">
 							<b-col cols="12" md="10" lg="8" xl="" :key="`g_${g}`" :class="['bg-light', 'border','p-3','mx-2']">
@@ -147,7 +147,7 @@
 									<b-row :class="!(Q[g*20+q].cat && Q[g*20+q].key) ? 'text-danger' : 'text-default'">
 										<b-col cols="1"><strong>{{g*20+q+1}}</strong></b-col>
 										<b-col cols="">
-											<b-form-select v-model="Q[g*20+q].cat">
+											<b-form-select v-model="Q[g*20+q].cat" @input="saveQuestions">
 												<option :value="null">--</option>
 												<option value="ALGE">Algebra</option>
 												<option value="ANGE">Analytical geometry</option>
@@ -157,7 +157,7 @@
 											</b-form-select>
 										</b-col>
 										<b-col cols="3" class="d-block d-md-none">
-											<b-form-select v-model="Q[g*20+q].key">
+											<b-form-select v-model="Q[g*20+q].key" @input="saveQuestions">
 												<option :value="null">--</option>
 												<option :value="1">1</option>
 												<option :value="2">2</option>
@@ -180,11 +180,11 @@
 							</b-col>
 						</template>
 					</b-row>
-					<div class="p-3">
-						<b-btn class="ml-auto d-block" variant="primary" @click="saveQuestions">
+					<!-- <div class="p-3">
+						<b-btn variant="primary" @click="saveQuestions">
 							Save
 						</b-btn>
-					</div>
+					</div> -->
 				</div>
 			</b-tab>
 			<!-- Evaluation: integration with scantron -->
@@ -233,7 +233,7 @@
 </template>
 
 <script>
-import { debounce, escapeRegExp } from "lodash";
+import { debounce, escapeRegExp, pick } from "lodash";
 import registration from "./form/registration.vue";
 import maintenance from "./maintenance.vue";
 import jsPDF from "jspdf";
@@ -334,8 +334,9 @@ export default {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} else {
-						this.Q = response.data.questions;
+					} 
+					else {
+						this.Q = response.data.questions.map(i => pick(i,['cat','key']));
 					}
 				})
 				.catch(error => {
@@ -356,8 +357,6 @@ export default {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} else {
-						this.$noty.success(`Questions updated`);
 					}
 				})
 				.catch(error => {
