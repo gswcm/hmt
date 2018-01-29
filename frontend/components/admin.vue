@@ -38,7 +38,27 @@
 				We will send an e-mail with password recovery link to <strong>{{credentials.email}}</strong>. Please confirm your will or close this dialog to cancel recovery process.
 			</p>
 		</b-modal>
-		<records :credentials="credentials" v-if="authenticated"/>
+		
+		<!-- <records :credentials="credentials" v-if="authenticated"/> -->
+		<b-tabs v-if="authenticated">
+			<!-- Registrations: view and print -->
+			<b-tab title="<span class='d-none d-sm-inline-block'>Records</span><span class='d-inline-block d-sm-none'>Recs</span>" active>
+				<records :credentials="credentials"/>
+			</b-tab>
+			<!-- Questions: edit -->
+			<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs</span>">
+				<questions :credentials="credentials"/>
+			</b-tab>
+			<!-- Scantron: integration with scantron -->
+			<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan</span>">
+				<scantron :credentials="credentials"/>
+			</b-tab>
+			<!-- Maintenance -->
+			<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint</span>" title-item-class="ml-auto">
+				<maintenance :credentials="credentials"/>
+			</b-tab>
+		</b-tabs>
+
 		<b-alert v-else show variant="warning">
 			<p class="text-justified">
 				This banner will be replaced with the real admin interface as soon as you provide correct credentials. So keep on trying...
@@ -49,8 +69,11 @@
 
 <script>
 import { mapGetters } from "vuex";
-import records from './records.vue'
 import { debounce } from 'lodash';
+import records from './admin/records.vue';
+import questions from './admin/questions.vue';
+import scantron from './admin/scantron.vue';
+import maintenance from "./admin/maintenance.vue";
 export default {
 	data: () => ({
 		credentials: {
@@ -61,14 +84,21 @@ export default {
 		registrations: []
 	}),
 	components: {
-		records
+		records, questions, scantron, maintenance
 	},
 	created() {
 		this.credentials.email = this.email;
 		this.credentialChecker();
 	},
 	mounted() {
-		this.$nextTick(() => this.$refs.password.focus());
+		if(typeof this.$nextTick === 'function') {
+			this.$nextTick(() => {
+				let el = this.$refs.password;
+				if(el) {
+					el.focus();
+				}
+			});
+		}
 	},
 	beforeRouteEnter(to, from, next) {
 		next(vm => {

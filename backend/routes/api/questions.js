@@ -13,12 +13,13 @@ router.post("/Q", (req, res) => {
 	})
 	.then((q) => {
 		if(!q) {
-			q = new Q({
-				questions: Array.apply(null, Array(40)).map(() => ({
-					cat: null,
-					key: null
-				}))
-			});
+			q = new Q();
+		}
+		if(!q.questions || !q.questions.length) {
+			q.questions = Array.apply(null, Array(40)).map(() => ({
+				cat: null,
+				key: null
+			}));
 		}
 		if(questions && questions.length) {
 			q.questions = questions;

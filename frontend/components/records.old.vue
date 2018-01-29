@@ -235,13 +235,11 @@
 <script>
 import { debounce, escapeRegExp, pick } from "lodash";
 import registration from "./form/registration.vue";
-import maintenance from "./maintenance.vue";
 import jsPDF from "jspdf";
 import { sprintf } from "sprintf-js";
 export default {
 	components: {
 		registration,
-		maintenance
 	},
 	props: {
 		credentials: Object

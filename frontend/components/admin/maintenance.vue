@@ -35,9 +35,7 @@ export default {
 		}
 	}),
 	created() {
-		this.$nextTick(() => {
-			this.runtime.credentials = this.credentials;
-		});
+		this.runtime.credentials = this.credentials;
 	},
 	watch: {
 		credentials() {
