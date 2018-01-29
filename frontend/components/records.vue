@@ -2,7 +2,7 @@
 	<div>
 		<b-tabs>
 			<!-- Registrations: view and print -->
-			<b-tab title="Registrations" active>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Records</span><span class='d-inline-block d-sm-none'>Recs.</span>" active>
 				<b-row class="p-4">
 					<b-col cols="12" md="auto">
 						<h4 class="my-3">Filters</h4>
@@ -137,7 +137,7 @@
 				</b-row>
 			</b-tab>
 			<!-- Questions: edit -->
-			<b-tab title="Questions">
+			<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs.</span>">
 				<div v-if="Q.length" class="p-4">
 					<p>Specify category and a correct answer for each question. Then save changes if any.</p>
 					<b-row class="p-3">
@@ -188,10 +188,44 @@
 				</div>
 			</b-tab>
 			<!-- Evaluation: integration with scantron -->
-			<b-tab title="Evaluation" disabled>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Evaluation</span><span class='d-inline-block d-sm-none'>Eval...</span>">
+				<div class="p-4">
+					<b-row>
+						<b-col cols="12" sm="" class="">
+							<b-textarea :value="scanData" @input="scanUpdated" no-resize :rows="10" wrap="off" class="bg-light border-info" placeholder="Scantron"/>
+						</b-col>
+						<b-col cols="auto" class="d-none d-sm-flex flex-column justify-content-center">
+							<b-btn variant="outline-dark" @click="scanToEval">
+								<i class="fa fa-chevron-right" aria-hidden="true"></i>
+							</b-btn>
+						</b-col>
+						<b-col cols="12" class="d-block d-sm-none my-3">
+							<b-btn class="mx-auto d-block" variant="outline-dark" @click="scanToEval">
+								<i class="fa fa-chevron-down" aria-hidden="true"></i>
+							</b-btn>
+						</b-col>
+						<b-col cols="12" sm="" class="" >
+							<b-textarea v-model="evalData" :rows="10" wrap="off" class="bg-light border-success" :no-resize="true" placeholder="Evaluation"/>
+						</b-col>
+					</b-row>
+					<div class="mt-3 d-flex justify-content-end">
+						<b-btn variant="outline-dark" @click="evalProcess">
+							<i class="fa fa-question" aria-hidden="true"></i>
+							Test
+						</b-btn>
+						<b-btn variant="outline-dark" class="ml-3">
+							<i class="fa fa-floppy-o" aria-hidden="true"></i>
+							Save
+						</b-btn>
+						<b-btn variant="outline-dark" class="ml-3" @click="evalData = ''">
+							<i class="fa fa-trash-o" aria-hidden="true"></i>
+							Clear
+						</b-btn>
+					</div>
+				</div>
 			</b-tab>
 			<!-- Maintenance -->
-			<b-tab title="Maintenance" title-item-class="ml-auto">
+			<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint.</span>" title-item-class="ml-auto">
 				<maintenance :credentials="credentials"/>
 			</b-tab>
 		</b-tabs>
@@ -199,64 +233,100 @@
 </template>
 
 <script>
-	import { debounce, escapeRegExp } from 'lodash';
-	import registration from './form/registration.vue';
-	import maintenance from './maintenance.vue';
-	import jsPDF from 'jspdf';
-	import { sprintf }  from 'sprintf-js'; 
-	export default {
-		components: {
-			registration, maintenance
+import { debounce, escapeRegExp } from "lodash";
+import registration from "./form/registration.vue";
+import maintenance from "./maintenance.vue";
+import jsPDF from "jspdf";
+import { sprintf } from "sprintf-js";
+export default {
+	components: {
+		registration,
+		maintenance
+	},
+	props: {
+		credentials: Object
+	},
+	data: () => ({
+		records: [],
+		filter: {
+			paid: null,
+			admin: false,
+			confirmed: true,
+			email: "",
+			name: "",
+			school: "",
+			division: null
 		},
-		props: {
-			credentials: Object
+		Q: [],
+		email: "",
+		showMaintenance: false,
+		scanDataRaw: ["100500","00010897348"],
+		evalData: ""
+	}),
+	created() {
+		this.refresh();
+		this.getQuestions();
+	},
+	computed: {
+		scanData() {
+			return this.a2s(this.scanDataRaw)
 		},
-		data: () => ({
-			records: [],
-			filter: {
-				paid: null,
-				admin: false,
-				confirmed: true,
-				email: '',
-				name: '',
-				school: '',
-				division: null
-			},
-			Q: [],
-			email: '',
-			showMaintenance: false
-		}),
-		created() {
-			this.refresh();
-			this.getQuestions();
+		questionsValid() {
+			return this.Q.reduce((a, i) => a && i.cat && i.key, true);
 		},
-		computed: {
-			questionsValid() {
-				return this.Q.reduce((a,i) => a && i.cat && i.key, true)
-			},
-			paid() {
-				let record = this.records.find(i => i.email === this.email);
-				return record ? record.paid : false;
-			},
-			reg() {
-				return this.records.find(i => i.email === this.email);
-			},
-			reg_filtered() {
-				return (this.filter.confirmed && this.reg.main) ? this.reg.main : (this.reg.temp ? this.reg.temp : null);
-			},
-			options() {
-				return this.records.map(i => {
-					let rec = (this.filter.confirmed && i.main) ? i.main : i.temp;
-					return {
-						value: i.email,
-						text: `${rec.school.name} (${rec.team.names.length})`
-					};
-				});
-			},
+		paid() {
+			let record = this.records.find(i => i.email === this.email);
+			return record ? record.paid : false;
 		},
-		methods: {
-			getQuestions() {
-				this.axios.post("/api/Q", {
+		reg() {
+			return this.records.find(i => i.email === this.email);
+		},
+		reg_filtered() {
+			return this.filter.confirmed && this.reg.main
+				? this.reg.main
+				: this.reg.temp ? this.reg.temp : null;
+		},
+		options() {
+			return this.records.map(i => {
+				let rec = this.filter.confirmed && i.main ? i.main : i.temp;
+				return {
+					value: i.email,
+					text: `${rec.school.name} (${rec.team.names.length})`
+				};
+			});
+		}
+	},
+	methods: {
+		s2a(s, strict = false) {
+			s = s.replace(/[^0-9\n]/g,'');
+			if(strict) {
+				s = s.replace(/\n+/g,'\n')
+			}
+			let a = s.split(/\n/);
+			if(a.length === 1 && !a[0].length) {
+				a = [];
+			}
+			return a;
+		},
+		a2s(a) {
+			return a.join('\n');
+		},  
+		s2s(s) {
+			return this.a2s(this.s2a(s, true));
+		},
+		scanUpdated(value) {
+			this.scanDataRaw = this.s2a(value);
+		},
+		scanToEval() {
+			this.evalData = this.s2s(this.scanData);
+		},
+		evalProcess() {
+			let arr = this.s2a(this.evalData);
+			console.log(JSON.stringify(arr, null, 3));
+		},
+		getQuestions() {
+			this.axios
+				.post("/api/Q", {
 					credentials: this.credentials
 				})
 				.then(response => {
@@ -264,8 +334,7 @@
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} 
-					else {
+					} else {
 						this.Q = response.data.questions;
 					}
 				})
@@ -275,9 +344,10 @@
 					);
 					console.error(error.stack);
 				});
-			},
-			saveQuestions() {
-				this.axios.post("/api/Q", {
+		},
+		saveQuestions() {
+			this.axios
+				.post("/api/Q", {
 					questions: this.Q,
 					credentials: this.credentials
 				})
@@ -286,8 +356,7 @@
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} 
-					else {
+					} else {
 						this.$noty.success(`Questions updated`);
 					}
 				})
@@ -297,24 +366,25 @@
 					);
 					console.error(error.stack);
 				});
-			},
-			printMany() {
-				this.records.reduce((a,i) => this.printOne(i, false, a), null).save('bulk.pdf');
-			},			
-			printOne(reg, output = true, doc = null) {
-				if(doc) {
-					doc.addPage();
-				}
-				else {
-					doc = new jsPDF({
-						orientation: 'p',
-						unit: 'mm',
-						format: [279.4,152.4]
-					});				
-					doc.setFontSize(12);
-				}
-				//-- Test pattern, not to be printed in production
-				/*
+		},
+		printMany() {
+			this.records
+				.reduce((a, i) => this.printOne(i, false, a), null)
+				.save("bulk.pdf");
+		},
+		printOne(reg, output = true, doc = null) {
+			if (doc) {
+				doc.addPage();
+			} else {
+				doc = new jsPDF({
+					orientation: "p",
+					unit: "mm",
+					format: [279.4, 152.4]
+				});
+				doc.setFontSize(12);
+			}
+			//-- Test pattern, not to be printed in production
+			/*
 				for(let x=0; x<10; x++) {
 					for(let y=0; y<10; y++) {
 						// HP_M401dw
@@ -324,34 +394,45 @@
 				doc.text('Simon Baev | Georgia Southwestern State University', 72, 200, {}, 90);
 				doc.save('test.pdf');
 				*/
-				let studentIndex = 0;
-				let seq = reg.seq;
-				let rec = (this.filter.confirmed && reg.main) ? reg.main : reg.temp;
-				let schoolName = rec.school.name;
-				for(let s of rec.team.names) {
-					let id = sprintf("%s%02d", seq, studentIndex++);	
-					doc.text(`${s} | ${schoolName}`, 72, 200, {}, 90);
-					let colIndex = 0;
-					for(let c of id.split("")) {
-						let i = parseInt(c);
-						doc.rect(58.5 + colIndex++ * 4.2 + 0.6, 10.2 + i * 4.2 + 1.4, 2.9, 1.4, 'F');		
-					}
-					if(studentIndex < rec.team.names.length) {
-						doc.addPage();
-					}
+			let studentIndex = 0;
+			let seq = reg.seq;
+			let rec = this.filter.confirmed && reg.main ? reg.main : reg.temp;
+			let schoolName = rec.school.name;
+			for (let s of rec.team.names) {
+				let id = sprintf("%s%02d", seq, studentIndex++);
+				doc.text(`${s} | ${schoolName}`, 72, 200, {}, 90);
+				let colIndex = 0;
+				for (let c of id.split("")) {
+					let i = parseInt(c);
+					doc.rect(
+						58.5 + colIndex++ * 4.2 + 0.6,
+						10.2 + i * 4.2 + 1.4,
+						2.9,
+						1.4,
+						"F"
+					);
 				}
-				if(output) {
-					doc.save(`${rec.school.division.replace(/\s+/g,'_')}_${seq}_${rec.school.name.replace(/\s+/g,'')}.pdf`);
+				if (studentIndex < rec.team.names.length) {
+					doc.addPage();
 				}
-				else {
-					return doc;
-				}
-			},
-			onCopy() {
-				this.$noty.success(`E-mail copied into clipboard`);
-			},
-			confirmRegistration() {
-				this.axios.post("/api/admin/confirm", {
+			}
+			if (output) {
+				doc.save(
+					`${rec.school.division.replace(
+						/\s+/g,
+						"_"
+					)}_${seq}_${rec.school.name.replace(/\s+/g, "")}.pdf`
+				);
+			} else {
+				return doc;
+			}
+		},
+		onCopy() {
+			this.$noty.success(`E-mail copied into clipboard`);
+		},
+		confirmRegistration() {
+			this.axios
+				.post("/api/admin/confirm", {
 					email: this.email,
 					credentials: this.credentials
 				})
@@ -360,9 +441,12 @@
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} 
-					else {
-						this.$noty.success(`Registration for ${response.data.email} has been confirmed`);
+					} else {
+						this.$noty.success(
+							`Registration for ${
+								response.data.email
+							} has been confirmed`
+						);
 						this.refresh();
 					}
 				})
@@ -372,9 +456,10 @@
 					);
 					console.error(error.stack);
 				});
-			},
-			removeRecord() {
-				this.axios.post("/api/admin/remove", {
+		},
+		removeRecord() {
+			this.axios
+				.post("/api/admin/remove", {
 					email: this.email,
 					credentials: this.credentials
 				})
@@ -383,9 +468,12 @@
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} 
-					else {
-						this.$noty.success(`Registration record for ${response.data.email} has been removed`);
+					} else {
+						this.$noty.success(
+							`Registration record for ${
+								response.data.email
+							} has been removed`
+						);
 						this.refresh();
 					}
 				})
@@ -395,21 +483,25 @@
 					);
 					console.error(error.stack);
 				});
-			},
-			paidUpdated(value) {
-				this.axios.post("/api/admin/paid", {
+		},
+		paidUpdated(value) {
+			this.axios
+				.post("/api/admin/paid", {
 					email: this.email,
 					credentials: this.credentials,
-					paid: value,
+					paid: value
 				})
 				.then(response => {
 					if (response.data.status) {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} 
-					else {
-						this.$noty.success(`Payment status has been updated to '${response.data.paid ? 'paid' : 'not paid'}'`);
+					} else {
+						this.$noty.success(
+							`Payment status has been updated to '${
+								response.data.paid ? "paid" : "not paid"
+							}'`
+						);
 						this.refresh();
 					}
 				})
@@ -419,64 +511,68 @@
 					);
 					console.error(error.stack);
 				});
-			},
-			debounce: debounce(function(source,value) {
-				this.filterUpdated(source,value)
-			}, 500),
-			filterUpdated(source,value) {
-				this.filter[source] = value;
-				this.refresh();
-			},
-			refresh() {
-				let filter = {
-					account: {
-						admin: {
-							$in: this.filter.admin === null ? [true,false] : [this.filter.admin]
-						}
-					},
-					registration: {}
+		},
+		debounce: debounce(function(source, value) {
+			this.filterUpdated(source, value);
+		}, 500),
+		filterUpdated(source, value) {
+			this.filter[source] = value;
+			this.refresh();
+		},
+		refresh() {
+			let filter = {
+				account: {
+					admin: {
+						$in:
+							this.filter.admin === null
+								? [true, false]
+								: [this.filter.admin]
+					}
+				},
+				registration: {}
+			};
+			if (this.filter.paid !== null) {
+				filter.registration["paid"] = this.filter.paid;
+			}
+			if (this.filter.email.length) {
+				filter.registration["email"] = {
+					$regex: escapeRegExp(this.filter.email)
 				};
-				if(this.filter.paid !== null) {
-					filter.registration["paid"] = this.filter.paid;
-				}
-				if(this.filter.email.length) {
-					filter.registration["email"] = {
-						$regex: escapeRegExp(this.filter.email)
-					}
-				}
-				if(this.filter.name.length) {
-					filter.registration["temp.sponsor.name"] = {
-						$regex: escapeRegExp(this.filter.name),
-						$options: 'i'
-					}
-				}
-				if(this.filter.school.length) {
-					filter.registration["temp.school.name"] = {
-						$regex: escapeRegExp(this.filter.school),
-						$options: 'i'
-					}
-				}
-				if(this.filter.division !== null) {
-					filter.registration["temp.school.division"] = this.filter.division;
-				}
-				if(this.filter.confirmed !== null) {
-					filter.registration["main"] = this.filter.confirmed ? { $ne: null} : { $eq: null };
-				}
-				this.axios.post("/api/admin/records", { filter })
+			}
+			if (this.filter.name.length) {
+				filter.registration["temp.sponsor.name"] = {
+					$regex: escapeRegExp(this.filter.name),
+					$options: "i"
+				};
+			}
+			if (this.filter.school.length) {
+				filter.registration["temp.school.name"] = {
+					$regex: escapeRegExp(this.filter.school),
+					$options: "i"
+				};
+			}
+			if (this.filter.division !== null) {
+				filter.registration["temp.school.division"] = this.filter.division;
+			}
+			if (this.filter.confirmed !== null) {
+				filter.registration["main"] = this.filter.confirmed
+					? { $ne: null }
+					: { $eq: null };
+			}
+			this.axios
+				.post("/api/admin/records", { filter })
 				.then(response => {
 					if (response.data.status) {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} 
-					else {
+					} else {
 						this.records = response.data.records;
-						if(this.records.length) {
-							if(!this.records.find(i => i.email === this.email)) {
+						if (this.records.length) {
+							if (!this.records.find(i => i.email === this.email)) {
 								this.email = this.records[0].email;
 							}
-						}
-						else {
+						} else {
 							this.email = null;
 						}
 					}
@@ -487,20 +583,19 @@
 					);
 					console.error(error.stack);
 				});
-			}
 		}
 	}
+};
 </script>
 
 <style lang="scss">
-	.border-left {
-		border-left: 2px solid #aaa;
-	}
-	hr {
-		border: 1px solid black;
-	}
-	.nav-tabs:focus {
-		outline: none;
-	}
+.border-left {
+	border-left: 2px solid #aaa;
+}
+hr {
+	border: 1px solid black;
+}
+.nav-tabs:focus {
+	outline: none;
+}
 </style>
-
