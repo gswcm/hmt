@@ -23,7 +23,8 @@ import {
 	faCheck,
 	faDownload,
 	faCopy,
-	faSyncAlt
+	faSyncAlt,
+   faTrash
 } from '@fortawesome/fontawesome-free-solid';
 import bootstrapVue from 'bootstrap-vue';
 import store from './store';
@@ -38,6 +39,7 @@ fontawesome.library.add(
 	faAngleDoubleDown, 
 	faQuestionCircle,
 	faTrashAlt,
+	faTrash,
 	faSave,
 	faCheck,
 	faDownload,

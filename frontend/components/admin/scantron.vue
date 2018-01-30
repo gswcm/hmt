@@ -2,7 +2,7 @@
 	<div class="p-4">
 		<b-row>
 			<b-col cols="12" sm="" class="">
-				<b-textarea :value="scanString" @input="scanUpdated" :rows="10" :max-rows="20" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron"/>
+				<b-textarea :value="scanString" @input="scanUpdated" :rows="15" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron"/>
 			</b-col>
 			<b-col cols="auto" class="d-none d-sm-flex flex-column justify-content-center">
 				<b-btn variant="outline-dark" @click="scanToEval">
@@ -17,25 +17,27 @@
 				</b-btn>
 			</b-col>
 			<b-col cols="12" sm="" class="" >
-				<b-textarea :value="evalString" @input="evalUpdated" :rows="10" :max-rows="20" wrap="off" class="bg-light" :no-resize="true" placeholder="Evaluation"/>
+				<b-textarea :value="evalString" @input="evalUpdated" :rows="15" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Evaluation"/>
 			</b-col>
 		</b-row>
 		<div class="mt-3 d-flex justify-content-end">
 			<b-btn variant="outline-dark" @click="evalProcess">
-				<!-- <i class="fa fa-question" aria-hidden="true"></i> -->
-				<font-awesome-icon :icon="['fas', 'question-circle']"/>
-				Test
-			</b-btn>
-			<b-btn variant="outline-dark" class="ml-3">
-				<!-- <i class="fa fa-floppy-o" aria-hidden="true"></i> -->
 				<font-awesome-icon :icon="['fas', 'save']"/>
 				Save
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3" @click="evalData = []">
-				<!-- <i class="fa fa-trash-o" aria-hidden="true"></i> -->
 				<font-awesome-icon :icon="['fas', 'trash-alt']"/>
-				Clear
+				Clear local
 			</b-btn>
+			<b-btn variant="outline-dark" class="ml-3" v-b-modal.confirmClearRemote v-b-tooltip.hover title="Clear scan data stored in the database">
+				<font-awesome-icon :icon="['fas', 'trash']"/>
+				Clear remote
+			</b-btn>
+			<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
+				<p>
+					You are about to erase all scan records in the database. Please confirm your will or close this dialog to cancel.
+				</p>
+			</b-modal>
 		</div>
 	</div>
 </template>
@@ -94,7 +96,50 @@ export default {
 		},
 		evalProcess() {
 			console.log(JSON.stringify(this.evalData, null, 3));
+			this.axios
+			.post("/api/scan", {
+				credentials: this.runtime.credentials,
+				evalData: this.evalData
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.$noty.success(`Evaluation data have been merged into database`);
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
 		},
+		confirmClearRemote() {
+			this.axios
+			.post("/api/scan", {
+				credentials: this.runtime.credentials
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.$noty.success(`Scan records have been removed from the database`);
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
+		}
 	}
 };
 </script>
