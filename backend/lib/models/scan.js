@@ -7,17 +7,11 @@ const scanSchema = mongoose.Schema({
 	data: {
 		type: String,
 		required: true,
-		default: ''
+		validate: [ value => /^\d{4}/.test(value) && value.length === 49, 'Bad value {VALUE}']
 	}
 })
 .pre('save', function(next){
-	let doc = this;
-	if(doc.data.length > 4) {
-		doc._id = doc.data.substr(0,4);
-	}
-	else {
-		console.log('Incorrect record: ', doc);
-	}
+	this._id = this.data.substr(0,4);
 	next();
 });
 

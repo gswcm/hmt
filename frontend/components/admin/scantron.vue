@@ -51,7 +51,13 @@ export default {
 		runtime: {
 			credentials: {}
 		},
-		scanData: ["100500","1234JKGJG"],
+		scanData: [
+			"100500",
+			"4108153400320001344405205504044014010314230000000",
+			"2013152435351111314425121141232412155315314300000",
+			"4043151423250031000404000251002000040000000000000",
+			"1234JKGJG"
+		],
 		evalData: [],
 	}),
 	created() {
@@ -92,10 +98,9 @@ export default {
 			this.evalData = this.s2a(value, true);
 		},
 		scanToEval() {
-			this.evalData = this.scanData.filter(i => /[0-9]{4,}/g.test(i));
+			this.evalData = this.evalData.concat(this.scanData.filter(i => /^\d{4}/.test(i) && i.length === 49));
 		},
 		evalProcess() {
-			console.log(JSON.stringify(this.evalData, null, 3));
 			this.axios
 			.post("/api/scan", {
 				credentials: this.runtime.credentials,
@@ -108,6 +113,7 @@ export default {
 					throw error;
 				} 
 				else {
+					console.log(JSON.stringify(response.data.result, null, 3));
 					this.$noty.success(`Evaluation data have been merged into database`);
 				}
 			})
@@ -130,7 +136,7 @@ export default {
 					throw error;
 				} 
 				else {
-					this.$noty.success(`Scan records have been removed from the database`);
+					this.$noty.success(`All existing scan records have been removed from the database`);
 				}
 			})
 			.catch(error => {
@@ -143,3 +149,10 @@ export default {
 	}
 };
 </script>
+
+<style>
+	textarea {
+		font-family: 'Roboto Mono', monospace;
+		font-weight: 400;
+	}
+</style>

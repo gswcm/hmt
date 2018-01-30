@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ProgressPlugin = require("progress-webpack-plugin");
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
+const GoogleFontsPlugin = require("google-fonts-webpack-plugin")
 const webpack = require('webpack');
 
 const parts = require("./webpack.parts");
@@ -36,7 +37,8 @@ const commonConfig = merge([
 						{
 							tag: "meta",
 							name: "viewport",
-							content: "width=device-width, initial-scale=0.75, user-scalable=no"
+							content:
+								"width=device-width, initial-scale=0.75, user-scalable=no"
 						},
 						{
 							tag: "meta",
@@ -71,7 +73,12 @@ const commonConfig = merge([
 				appMountId: "app"
 			}),
 			new ScriptExtHtmlWebpackPlugin({
-				defaultAttribute: 'defer'
+				defaultAttribute: "defer"
+			}),
+			new GoogleFontsPlugin({
+				fonts: [
+					{ family: "Roboto Mono", variants: ["400", "500", "700"] }
+				]
 			}),
 			new ProgressPlugin(true),
 			new FriendlyErrorsWebpackPlugin(),
@@ -79,7 +86,8 @@ const commonConfig = merge([
 		],
 		resolve: {
 			alias: {
-				'@fortawesome/fontawesome-free-solid$': '@fortawesome/fontawesome-free-solid/shakable.es.js'
+				"@fortawesome/fontawesome-free-solid$":
+					"@fortawesome/fontawesome-free-solid/shakable.es.js"
 			}
 		}
 	},
