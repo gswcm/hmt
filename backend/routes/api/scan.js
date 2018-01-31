@@ -34,18 +34,45 @@ router.post("/scan", (req, res) => {
 				})
 			)
 			.then(result => {
-				//-- Check valid data records for collision with existing (in DB) ones
-				return result.OK.reduce(
+				//-- Find inner (or semi-) collisions of submitted scan records without consulting DB
+				let dups = {};
+				let keys = [];
+				let redo = [];
+				return result.OK
+				.filter(
+					i => {
+						let key = i.substr(0,4);
+						if(keys.indexOf(key) > -1) {
+							if(!dups[key]) {
+								dups[key] = {
+									db: '',
+									scan: []
+								};
+							}
+							dups[key].scan.push(i);
+							redo.push(i);
+							return false;
+						}
+						else {
+							keys.push(key);
+							return true;
+						}
+					}
+				)
+				.reduce(
 					(a,i) => {
 						return Scan.findById(i.substr(0,4))
 						.then((doc) => a
 							.then(result => {
 								if(doc) {
-									result.duplicates[doc._id] = {
-										old: doc.data,
-										new: i,
-										same: i === doc.data
-									};
+									if(!result.duplicates[doc._id]) {
+										result.duplicates[doc._id] = {											
+											scan: []
+										};
+									}	
+									result.duplicates[doc._id].db = doc.data,
+									result.duplicates[doc._id].scan.push(i);
+									result.redo.push(i);
 								}
 								else {
 									result.OK.push(i);
@@ -56,7 +83,8 @@ router.post("/scan", (req, res) => {
 					}, 
 					Promise.resolve({
 						OK: [],
-						duplicates: {},
+						redo: redo,
+						duplicates: dups,
 						invalid: result.invalid
 					})
 				);
@@ -65,12 +93,14 @@ router.post("/scan", (req, res) => {
 				return Promise.all(result.OK.map(i => new Scan({ data: i }).save()))
 				.then(() => {
 					if(force) {
-						let dups = result.duplicates;
-						return Promise.all(Object.keys(dups).map(i => Scan.findByIdAndUpdate(i,{$set:{data:dups[i].new}})))
+						return Promise.all(result.redo.sort().map(i => {
+							return Scan.findByIdAndUpdate(i.substr(0,4),{ $set: {data: i} });
+						}))
 						.then(() => {
-							result.OK = result.OK.concat(Object.keys(dups).map(i => dups[i].new));
+							result.OK = result.OK.concat(result.redo);
+							result.redo = [];
 							result.duplicates = {};
-							return Promise.resolve(result); 	 
+							return Promise.resolve(result);
 						});
 					}
 					else {

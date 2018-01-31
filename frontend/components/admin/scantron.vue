@@ -122,7 +122,7 @@ export default {
 			return a;
 		},
 		a2s(a) {
-			return a.join('\n');
+			return a.sort().map(i => `${i.substr(0,4)} ${i.substr(4,40)} ${i.substr(44)}`).join('\n');
 		},  
 		scanUpdated(value) {
 			this.scanData = this.s2a(value);
@@ -148,7 +148,7 @@ export default {
 				} 
 				else {
 					console.log(JSON.stringify(response.data.result, null, 3));
-					this.evalData = Object.keys(response.data.result.duplicates).map(e => response.data.result.duplicates[e].new);
+					this.evalData = response.data.result.redo;
 					if(this.evalData.length) {
 						this.$noty.warning(`Some records have not been merged due to ID collision`);
 					}
