@@ -21,17 +21,37 @@
 			</b-col>
 		</b-row>
 		<div class="mt-3 d-flex justify-content-end">
-			<b-btn variant="outline-dark" @click="evalProcess">
-				<font-awesome-icon :icon="['fas', 'save']"/>
-				Save
+			<!-- 
+			<b-form-checkbox v-model="force" class="d-block mr-auto">
+				Force
+			</b-form-checkbox> 
+			-->
+			<b-btn 
+				:disabled="!evalDataFiltered.length" 
+				variant="outline-dark" 
+				@click="evalProcess(true)">
+				<font-awesome-icon :icon="['fas', 'plus']"/>
+				<span class="d-none d-sm-inline-block">Override</span>
+				<span class="d-inline-block d-sm-none">O.</span>
+			</b-btn>
+			<b-btn 
+				:disabled="!evalDataFiltered.length" 
+				variant="outline-dark" 
+				class="ml-3"
+				@click="evalProcess(false)">
+				<font-awesome-icon :icon="['fas', 'plus']"/>
+				<span class="d-none d-sm-inline-block">Skip</span>
+				<span class="d-inline-block d-sm-none">S.</span>
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3" @click="evalData = []">
 				<font-awesome-icon :icon="['fas', 'trash-alt']"/>
-				Clear local
+				<span class="d-none d-sm-inline-block">Local</span>
+				<span class="d-inline-block d-sm-none">L.</span>
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3" v-b-modal.confirmClearRemote v-b-tooltip.hover title="Clear scan data stored in the database">
 				<font-awesome-icon :icon="['fas', 'trash']"/>
-				Clear remote
+				<span class="d-none d-sm-inline-block">Remote</span>
+				<span class="d-inline-block d-sm-none">R.</span>
 			</b-btn>
 			<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
 				<p>
@@ -59,6 +79,7 @@ export default {
 			"1234JKGJG"
 		],
 		evalData: [],
+		force: false
 	}),
 	created() {
 		this.runtime.credentials = this.credentials;
@@ -69,6 +90,18 @@ export default {
 		},
 		evalString() {
 			return this.a2s(this.evalData, true);
+		},
+		evalDataFiltered() {
+			let found = [];
+			return this.evalData.filter(i => {
+				if(found.indexOf(i) === -1) {
+					found.push(i);
+					return true;
+				}
+				else {
+					return false;
+				}
+			})
 		}
 	},
 	watch: {
@@ -98,13 +131,14 @@ export default {
 			this.evalData = this.s2a(value, true);
 		},
 		scanToEval() {
-			this.evalData = this.evalData.concat(this.scanData.filter(i => /^\d{4}/.test(i) && i.length === 49));
+			this.evalData = this.evalData.concat(this.scanData);
 		},
-		evalProcess() {
+		evalProcess(force = false) {
 			this.axios
 			.post("/api/scan", {
 				credentials: this.runtime.credentials,
-				evalData: this.evalData
+				evalData: this.evalDataFiltered,
+				force
 			})
 			.then(response => {
 				if (response.data.status) {
@@ -114,7 +148,13 @@ export default {
 				} 
 				else {
 					console.log(JSON.stringify(response.data.result, null, 3));
-					this.$noty.success(`Evaluation data have been merged into database`);
+					this.evalData = Object.keys(response.data.result.duplicates).map(e => response.data.result.duplicates[e].new);
+					if(this.evalData.length) {
+						this.$noty.warning(`Some records have not been merged due to ID collision`);
+					}
+					else {
+						this.$noty.success(`Evaluation data have been successfully merged into database`);
+					}
 				}
 			})
 			.catch(error => {

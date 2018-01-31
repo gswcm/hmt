@@ -7,6 +7,7 @@ const evalCredentials = require("../../lib/utils").evalCredentials;
 router.post("/scan", (req, res) => {
 	let credentials = req.body.credentials;
 	let evalData = req.body.evalData;
+	let force = req.body.force;
 	evalCredentials(credentials)
 	.then(() => {
 		if(evalData && evalData.length) {
@@ -39,14 +40,23 @@ router.post("/scan", (req, res) => {
 						return Scan.findById(i.substr(0,4))
 						.then((doc) => a
 							.then(result => {
-								result[ doc ? 'duplicates' : 'OK' ].push(i);	
+								if(doc) {
+									result.duplicates[doc._id] = {
+										old: doc.data,
+										new: i,
+										same: i === doc.data
+									};
+								}
+								else {
+									result.OK.push(i);
+								}
 								return Promise.resolve(result);
 							})
 						);
 					}, 
 					Promise.resolve({
 						OK: [],
-						duplicates: [],
+						duplicates: {},
 						invalid: result.invalid
 					})
 				);
@@ -54,7 +64,18 @@ router.post("/scan", (req, res) => {
 			.then(result => {
 				return Promise.all(result.OK.map(i => new Scan({ data: i }).save()))
 				.then(() => {
-					return Promise.resolve(result); 
+					if(force) {
+						let dups = result.duplicates;
+						return Promise.all(Object.keys(dups).map(i => Scan.findByIdAndUpdate(i,{$set:{data:dups[i].new}})))
+						.then(() => {
+							result.OK = result.OK.concat(Object.keys(dups).map(i => dups[i].new));
+							result.duplicates = {};
+							return Promise.resolve(result); 	 
+						});
+					}
+					else {
+						return Promise.resolve(result); 	
+					}
 				});
 			});
 		}
