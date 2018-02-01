@@ -2,51 +2,70 @@
 	<div class="p-4">
 		<b-row>
 			<b-col cols="12" class="" >
-				<b-textarea ref="textarea" :value="evalString" @input="evalUpdated" :rows="15" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron data will show up here..."/>
+				<b-textarea ref="textarea" :value="evalString" @input="evalUpdated" :rows="5" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron data will show up here..."/>
 			</b-col>
 		</b-row>
-		<div class="mt-3 d-flex justify-content-end">
+		<div class="mt-3 px-3 row">
+			<!-- Left side -->
 			<b-btn 
 				variant="outline-dark" 
 				@click="evalLoad"
-				class="mr-auto">
+				class="col-5 col-sm-auto mt-3">
+				<!-- Load from DB -->
 				<font-awesome-icon :icon="['fas', 'database']"/>
-				<span class="d-none d-sm-inline-block">Load</span>
-				<span class="d-inline-block d-sm-none">L.</span>
+				<span class="ml-2">Load</span>
+			</b-btn>
+			<b-btn 
+				variant="outline-dark" 
+				class="col-5 col-sm-auto ml-auto ml-sm-3 mt-3" 
+				v-b-modal.confirmClearRemote 
+				v-b-tooltip.hover title="Clear scan data stored in the database">
+				<!-- Erase DB content -->
+				<font-awesome-icon :icon="['fas', 'database']"/>
+				<span class="ml-2">Clear</span>
+			</b-btn>
+			<!-- Middle -->
+			<b-btn 
+				:disabled="!evalDataFiltered.length" 
+				variant="outline-dark" 
+				@click="evalProcess(false)"
+				class="col-5 col-sm-auto ml-sm-auto mt-3">
+				<!-- Commit & skip conflicting records -->
+				<font-awesome-icon :icon="['fas', 'plus']"/>
+				<span class="ml-2">Skip</span>
 			</b-btn>
 			<b-btn 
 				:disabled="!evalDataFiltered.length" 
 				variant="outline-dark" 
-				@click="evalProcess(true)">
+				@click="evalProcess(true)"
+				class="col-5 col-sm-auto ml-sm-3 mt-3 order-4 order-sm-3">
+				<!-- Commit & override conflicting records -->
 				<font-awesome-icon :icon="['fas', 'plus']"/>
-				<span class="d-none d-sm-inline-block">Override</span>
-				<span class="d-inline-block d-sm-none">O.</span>
+				<span class="ml-2">Override</span>
+			</b-btn>
+			<!-- Right side -->
+			<b-btn 
+				variant="outline-dark" 
+				class="col-5 col-sm-auto ml-auto  mt-3 order-5 order-sm-4" 
+				@click="evalData = evalDataFiltered">
+				<!-- Reformat list of records -->
+				<font-awesome-icon :icon="['fas', 'filter']"/>
+				<span class="ml-2">Filter</span>
 			</b-btn>
 			<b-btn 
-				:disabled="!evalDataFiltered.length" 
 				variant="outline-dark" 
-				class="ml-3"
-				@click="evalProcess(false)">
-				<font-awesome-icon :icon="['fas', 'plus']"/>
-				<span class="d-none d-sm-inline-block">Skip</span>
-				<span class="d-inline-block d-sm-none">S.</span>
+				class="col-5 col-sm-auto ml-auto ml-sm-3 mt-3 order-3 order-sm-5" 
+				@click="evalData = []">
+				<!-- Clear list of records -->
+				<font-awesome-icon :icon="['fas', 'list']"/>
+				<span class="ml-2">Clear</span>
 			</b-btn>
-			<b-btn variant="outline-dark" class="ml-3" @click="evalData = []">
-				<font-awesome-icon :icon="['fas', 'trash-alt']"/>
-				<span class="d-none d-sm-inline-block">Clear</span>
-				<span class="d-inline-block d-sm-none">C.</span>
-			</b-btn>
-			<b-btn variant="outline-dark" class="ml-3" v-b-modal.confirmClearRemote v-b-tooltip.hover title="Clear scan data stored in the database">
-				<font-awesome-icon :icon="['fas', 'database']"/>
-				<span class="d-none d-sm-inline-block">Erase</span>
-				<span class="d-inline-block d-sm-none">E.</span>
-			</b-btn>
-			<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
-				<p>
-					You are about to erase all scan records in the database. Please confirm your will or close this dialog to cancel.
-				</p>
-			</b-modal>
 		</div>
+		<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
+			<p>
+				You are about to erase all scan records in the database. Please confirm your will or close this dialog to cancel.
+			</p>
+		</b-modal>
 	</div>
 </template>
 

@@ -15,8 +15,6 @@ import vueAxios from 'vue-axios';
 import fontawesome from '@fortawesome/fontawesome';
 import fontAwesomeIcon from '@fortawesome/vue-fontawesome';
 import { 
-	faAngleDoubleRight, 
-	faAngleDoubleDown,
 	faQuestionCircle,
 	faTrashAlt,
 	faSave,
@@ -27,7 +25,10 @@ import {
    faTrash,
    faEdit,
    faPlus,
-   faDatabase
+   faDatabase,
+   faWrench,
+	faList,
+	faFilter
 } from '@fortawesome/fontawesome-free-solid';
 import bootstrapVue from 'bootstrap-vue';
 import store from './store';
@@ -38,8 +39,6 @@ import 'vuejs-noty/dist/vuejs-noty.css';
 
 // Font Awesome 5 configurations
 fontawesome.library.add(
-	faAngleDoubleRight, 
-	faAngleDoubleDown, 
 	faQuestionCircle,
 	faTrashAlt,
 	faTrash,
@@ -50,7 +49,10 @@ fontawesome.library.add(
 	faSyncAlt,
 	faEdit,
 	faPlus,
-	faDatabase
+	faDatabase,
+	faWrench,
+	faList,
+	faFilter
 );
 
 const router = new vueRouter({
