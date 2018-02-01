@@ -26,7 +26,8 @@ import {
 	faSyncAlt,
    faTrash,
    faEdit,
-   faPlus
+   faPlus,
+   faDatabase
 } from '@fortawesome/fontawesome-free-solid';
 import bootstrapVue from 'bootstrap-vue';
 import store from './store';
@@ -48,7 +49,8 @@ fontawesome.library.add(
 	faCopy,
 	faSyncAlt,
 	faEdit,
-	faPlus
+	faPlus,
+	faDatabase
 );
 
 const router = new vueRouter({

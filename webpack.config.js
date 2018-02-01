@@ -77,7 +77,7 @@ const commonConfig = merge([
 			}),
 			new GoogleFontsPlugin({
 				fonts: [
-					{ family: "Roboto Mono", variants: ["400", "500", "700"] }
+					{ family: "Roboto Mono", variants: ["500"] }
 				]
 			}),
 			new ProgressPlugin(true),

@@ -1,31 +1,19 @@
 <template>
 	<div class="p-4">
 		<b-row>
-			<b-col cols="12" sm="" class="">
-				<b-textarea :value="scanString" @input="scanUpdated" :rows="15" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron"/>
-			</b-col>
-			<b-col cols="auto" class="d-none d-sm-flex flex-column justify-content-center">
-				<b-btn variant="outline-dark" @click="scanToEval">
-					<!-- <i class="fa fa-chevron-right" aria-hidden="true"></i> -->
-					<font-awesome-icon :icon="['fas', 'angle-double-right']"/>
-				</b-btn>
-			</b-col>
-			<b-col cols="12" class="d-block d-sm-none my-3">
-				<b-btn class="mx-auto d-block" variant="outline-dark" @click="scanToEval">
-					<!-- <i class="fa fa-chevron-down" aria-hidden="true"></i> -->
-					<font-awesome-icon :icon="['fas', 'angle-double-down']"/>
-				</b-btn>
-			</b-col>
-			<b-col cols="12" sm="" class="" >
-				<b-textarea :value="evalString" @input="evalUpdated" :rows="15" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Evaluation"/>
+			<b-col cols="12" class="" >
+				<b-textarea ref="textarea" :value="evalString" @input="evalUpdated" :rows="15" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron data will show up here..."/>
 			</b-col>
 		</b-row>
 		<div class="mt-3 d-flex justify-content-end">
-			<!-- 
-			<b-form-checkbox v-model="force" class="d-block mr-auto">
-				Force
-			</b-form-checkbox> 
-			-->
+			<b-btn 
+				variant="outline-dark" 
+				@click="evalLoad"
+				class="mr-auto">
+				<font-awesome-icon :icon="['fas', 'database']"/>
+				<span class="d-none d-sm-inline-block">Load</span>
+				<span class="d-inline-block d-sm-none">L.</span>
+			</b-btn>
 			<b-btn 
 				:disabled="!evalDataFiltered.length" 
 				variant="outline-dark" 
@@ -45,13 +33,13 @@
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3" @click="evalData = []">
 				<font-awesome-icon :icon="['fas', 'trash-alt']"/>
-				<span class="d-none d-sm-inline-block">Local</span>
-				<span class="d-inline-block d-sm-none">L.</span>
+				<span class="d-none d-sm-inline-block">Clear</span>
+				<span class="d-inline-block d-sm-none">C.</span>
 			</b-btn>
 			<b-btn variant="outline-dark" class="ml-3" v-b-modal.confirmClearRemote v-b-tooltip.hover title="Clear scan data stored in the database">
-				<font-awesome-icon :icon="['fas', 'trash']"/>
-				<span class="d-none d-sm-inline-block">Remote</span>
-				<span class="d-inline-block d-sm-none">R.</span>
+				<font-awesome-icon :icon="['fas', 'database']"/>
+				<span class="d-none d-sm-inline-block">Erase</span>
+				<span class="d-inline-block d-sm-none">E.</span>
 			</b-btn>
 			<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
 				<p>
@@ -63,6 +51,7 @@
 </template>
 
 <script>
+import { debounce } from 'lodash';
 export default {
 	props: {
 		credentials: Object
@@ -71,27 +60,19 @@ export default {
 		runtime: {
 			credentials: {}
 		},
-		scanData: [
-			"100500",
-			"4108153400320001344405205504044014010314230000000",
-			"2013152435351111314425121141232412155315314300000",
-			"4043151423250031000404000251002000040000000000000",
-			"1234JKGJG"
-		],
 		evalData: [],
-		force: false
+		force: false,
+		timer: null
 	}),
 	created() {
 		this.runtime.credentials = this.credentials;
 	},
 	computed: {
-		scanString() {
-			return this.a2s(this.scanData);
-		},
 		evalString() {
-			return this.a2s(this.evalData, true);
+			return this.timer ? this.evalStringBackup : this.a2s(this.evalData, true);
 		},
 		evalDataFiltered() {
+			//-- Remove exact duplicates
 			let found = [];
 			return this.evalData.filter(i => {
 				if(found.indexOf(i) === -1) {
@@ -122,20 +103,61 @@ export default {
 			return a;
 		},
 		a2s(a) {
-			return a.sort().map(i => `${i.substr(0,4)} ${i.substr(4,40)} ${i.substr(44)}`).join('\n');
+			return a.map(i => {
+				let result = "";
+				if(i.length > 4) {
+					result += `${i.substr(0,4)} `;
+					if(i.length > 44) {
+						result += `${i.substr(4,40)} ${i.substr(44)}`;
+					}
+					else {
+						result += `${i.substr(4)}`;
+					}
+				}
+				else {
+					result = i;
+				}
+				return result;
+			}).join('\n');
 		},  
-		scanUpdated(value) {
-			this.scanData = this.s2a(value);
-		},
 		evalUpdated(value) {
+			//-- Backup current "string" value of the textarea
+			this.evalStringBackup = value;
+			//-- Timer for editing time window control
+			if(this.timer) {
+				clearTimeout(this.timer);
+			}
+			this.timer = setTimeout( () => {
+				this.timer = null;
+			}, 1000)
+			//-- update the array of lines
 			this.evalData = this.s2a(value, true);
 		},
-		scanToEval() {
-			this.evalData = this.evalData.concat(this.scanData);
+		evalLoad() {
+			this.axios
+			.post("/api/scan/get", {
+				credentials: this.runtime.credentials,
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.evalData = this.evalData.concat(response.data.scans);
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
 		},
 		evalProcess(force = false) {
 			this.axios
-			.post("/api/scan", {
+			.post("/api/scan/set", {
 				credentials: this.runtime.credentials,
 				evalData: this.evalDataFiltered,
 				force
@@ -166,7 +188,7 @@ export default {
 		},
 		confirmClearRemote() {
 			this.axios
-			.post("/api/scan", {
+			.post("/api/scan/set", {
 				credentials: this.runtime.credentials
 			})
 			.then(response => {
@@ -193,6 +215,6 @@ export default {
 <style>
 	textarea {
 		font-family: 'Roboto Mono', monospace;
-		font-weight: 400;
+		font-weight: 500;
 	}
 </style>

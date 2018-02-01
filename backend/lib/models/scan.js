@@ -7,7 +7,7 @@ const scanSchema = mongoose.Schema({
 	data: {
 		type: String,
 		required: true,
-		validate: [ value => /^\d{4}/.test(value) && value.length === 49, 'Bad value {VALUE}']
+		validate: value => /^\d{4}[0-9A-E]{40}[0]{5}$/.test(value)
 	}
 })
 .pre('save', function(next){

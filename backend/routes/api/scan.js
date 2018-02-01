@@ -4,7 +4,27 @@ const router = express.Router();
 const Scan = require("../../lib/models/scan");
 const evalCredentials = require("../../lib/utils").evalCredentials;
 
-router.post("/scan", (req, res) => {
+router.post("/scan/get", (req, res) => {
+	let credentials = req.body.credentials;
+	evalCredentials(credentials)
+	.then(() => {
+		return Scan.find();
+	})
+	.then(scans => {
+		return res.json({ 
+			status: 0,
+			scans: scans.map(i => i.data)
+		});
+	})
+	.catch(error => {
+		res.json({
+			status: 500,
+			error: errToJSON(error)
+		});
+	});
+});
+
+router.post("/scan/set", (req, res) => {
 	let credentials = req.body.credentials;
 	let evalData = req.body.evalData;
 	let force = req.body.force;
