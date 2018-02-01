@@ -16,6 +16,7 @@ app.use("/api", require("./routes/api/admin"));
 app.use("/api", require("./routes/api/maintenance"));
 app.use("/api", require("./routes/api/questions"));
 app.use("/api", require("./routes/api/scan"));
+app.use("/api", require("./routes/api/results"));
 app.use("/api", require("./routes/api/start"));
 app.use("/api", require("./routes/api/email"));
 app.use("/api", require("./routes/api/statistics"));

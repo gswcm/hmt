@@ -53,6 +53,10 @@
 			<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan</span>">
 				<scantron :credentials="credentials"/>
 			</b-tab>
+			<!-- Results -->
+			<b-tab title="<span class='d-none d-sm-inline-block'>Results</span><span class='d-inline-block d-sm-none'>Res</span>">
+				<results/>
+			</b-tab>
 			<!-- Maintenance -->
 			<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint</span>" title-item-class="ml-auto">
 				<maintenance :credentials="credentials"/>
@@ -68,12 +72,13 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex';
 import { debounce } from 'lodash';
-import records from './admin/records.vue';
-import questions from './admin/questions.vue';
-import scantron from './admin/scantron.vue';
-import maintenance from "./admin/maintenance.vue";
+import records from './records.vue';
+import questions from './questions.vue';
+import scantron from './scantron.vue';
+import maintenance from './maintenance.vue';
+import results from '../results/index.vue';
 export default {
 	data: () => ({
 		credentials: {
@@ -84,7 +89,7 @@ export default {
 		registrations: []
 	}),
 	components: {
-		records, questions, scantron, maintenance
+		records, questions, scantron, maintenance, results
 	},
 	created() {
 		this.credentials.email = this.email;

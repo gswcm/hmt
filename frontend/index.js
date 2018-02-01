@@ -75,7 +75,7 @@ const router = new vueRouter({
 		{
 			path: '/admin',
 			component: () =>
-				import(/* webpackChunkName: 'admin' */ './components/admin.vue')
+				import(/* webpackChunkName: 'admin' */ './components/admin/index.vue')
 		},
 		{
 			path: '*',
