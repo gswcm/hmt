@@ -18,8 +18,12 @@ router.post("/results/get", (req, res) => {
 	.then(rq => {
 		return S.find({},{data:1})
 		.then(s => {
+			let r = {};
+			for(let i of rq.r) {
+				r[i.seq] = { ..._.pick(i.main,['team','school','sponsor']), seq:i.seq, email:i.email };
+			}
 			return Promise.resolve({
-				r: rq.r.map((e) => ({..._.pick(e.main,['team','school','sponsor']), seq:e.seq, email:e.email})),
+				r: r,
 				q: rq.q.questions.map(i => _.pick(i,['cat','key'])),
 				s: s.map(i => i.data)
 			});

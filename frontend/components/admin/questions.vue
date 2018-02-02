@@ -3,19 +3,12 @@
 		<p>Specify category and a correct answer for each question. All changes are saved automatically.</p>
 		<b-row class="p-3">
 			<template v-for="g in Array.from(Array(2).keys())">
-				<b-col cols="12" md="10" lg="8" xl="" :key="`g_${g}`" :class="['bg-light', 'border','p-3','mx-2']">
+				<b-col cols="12" sm="auto" xl="" :key="`g_${g}`" class="bg-light border p-3 mx-auto mx-xl-2">
 					<div v-for="q in Array.from(Array(20).keys())" :key="`q_${q}`">
 						<b-row :class="!(Q[g*20+q].cat && Q[g*20+q].key) ? 'text-danger' : 'text-default'">
 							<b-col cols="1"><strong>{{g*20+q+1}}</strong></b-col>
 							<b-col cols="">
-								<b-form-select v-model="Q[g*20+q].cat" @input="saveQuestions">
-									<option :value="null">--</option>
-									<option value="ALGE">Algebra</option>
-									<option value="ANGE">Analytical geometry</option>
-									<option value="GEOM">Geometry</option>
-									<option value="TRIG">Trigonometry</option>
-									<option value="MISC">Miscellaneous</option>
-								</b-form-select>
+								<b-form-select v-model="Q[g*20+q].cat" @input="saveQuestions" :options="options"/>
 							</b-col>
 							<b-col cols="3" class="d-block d-md-none">
 								<b-form-select v-model="Q[g*20+q].key" @input="saveQuestions">
@@ -46,6 +39,7 @@
 
 <script>
 import { pick } from "lodash";
+import { Q } from "../../../configs/dict";
 export default {
 	props: {
 		credentials: Object
@@ -55,9 +49,17 @@ export default {
 			credentials: {}
 		},
 		Q: [],
+		options: []
 	}),
 	created() {
 		this.runtime.credentials = this.credentials;
+		this.options = [
+			{ value: null, text: "--"},
+			...Object.keys(Q).map(i => ({
+				value: i,
+				text: Q[i]
+			}))
+		];
 		this.getQuestions();
 	},
 	watch: {
