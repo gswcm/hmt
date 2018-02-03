@@ -23,9 +23,9 @@ router.post("/results/get", (req, res) => {
 				r[i.seq] = { ..._.pick(i.main,['team','school','sponsor']), seq:i.seq, email:i.email };
 			}
 			return Promise.resolve({
-				r: r,
-				q: rq.q.questions.map(i => _.pick(i,['cat','key'])),
-				s: s.map(i => i.data)
+				R: r,
+				Q: rq.q.questions.map(i => _.pick(i,['cat','key'])),
+				S: s.map(i => i.data)
 			});
 		});
 	}) 

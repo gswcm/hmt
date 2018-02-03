@@ -39,7 +39,7 @@
 
 <script>
 import { pick } from "lodash";
-import { Q } from "../../../configs/dict";
+import { Q } from "../../../configs/params";
 export default {
 	props: {
 		credentials: Object

@@ -6,7 +6,8 @@
 
 <script>
 import { pick } from "lodash";
-import * as dict from "../../../configs/dict"
+import { sprintf } from "sprintf-js";
+import * as params from "../../../configs/params"
 export default {
 	props: {
 	},
@@ -32,11 +33,12 @@ export default {
 				} 
 				else {
 					this.log = [];
-					let {r,q,s} = {...response.data.rqs};
-					//-- inject statistics object into each question
-					// console.log(q);
-					for(let i of q) {
-						i.counters = {
+					let {R,Q,S} = {...response.data.rqs};
+					let questions = {};
+					//-- inject statistics object into each question and calculate number of questions in each category
+					for(let q of Q) {
+						questions[q.cat] = (questions[q.cat] || 0) + 1
+						q.counters = {
 							0: 0,
 							1: 0,
 							2: 0,
@@ -46,24 +48,33 @@ export default {
 							correct: 0
 						};
 					}
-					// -- Initialize results structure
+					/* 
+						Scantron records
+					*/
 					let tournament = null;
-					// -- Iterate through the list of scantron records
-					let stat = s.map(scan => {
-						let id = scan.substr(0,4);
-						let answers = scan.substr(4,40).split("").map(i => parseInt(i));
+					let show = [];
+					for(let i=0; i<S.length; i++) {				
+						let id = S[i].substr(0,4);
+						let answers = S[i].substr(4,40).split("").map(i => parseInt(i));
 						let seq = id.substr(0,2);
 						//-- Populate 'Student' object based on identified ID
-						if(!(seq in r)) {
-							this.log.push(`Scan parsing: incorrect ID in '${scan}' registration record '${seq}' is invalid`);
-							return;
+						if(!(seq in R)) {
+							this.log.push(`Scan parsing: incorrect ID in '${S[i]}' registration record '${seq}' is invalid`);
+							continue;
 						}
-						let reg = r[seq];
+						show.push(id);
+						let reg = R[seq];
+						//-- Teams with more than 8 members (params.studentsPerTeam) must be split to introduce ALT teams
+						let schoolName = reg.school.name
+						let studentIndexInSchool = parseInt(id.substr(2,2))
+						if(studentIndexInSchool >= params.studentsPerTeam) {
+							schoolName = `${schoolName} ALT${Math.floor(studentIndexInSchool/params.studentsPerTeam)}`
+						}
 						let student = {
 							id,
 							division: reg.school.division,
-							school: reg.school.name,
-							name: reg.team.names[parseInt(id.substr(2,2))],
+							school: schoolName,
+							name: reg.team.names[studentIndexInSchool],
 							counters: {
 								correct: {
 									total: 0
@@ -72,21 +83,21 @@ export default {
 								blank: 0
 							}	
 						}
-						for(let cat in dict.Q) {
+						for(let cat in params.Q) {
 							student.counters.correct[cat] = 0;
 						}
 						//-- Evaluate answers
-						for(let i=0; i<answers.length; i++) {
-							q[i].counters[answers[i]]++;
-							if(answers[i] === 0) {
+						for(let j=0; j<answers.length; j++) {
+							Q[j].counters[answers[j]]++;
+							if(answers[j] === 0) {
 								student.counters.blank++;
 								continue;
 							}
-							else if(answers[i] === q[i].key) {
+							else if(answers[j] === Q[j].key) {
 								//-- correct answer
-								q[i].counters.correct++;
+								Q[j].counters.correct++;
 								student.counters.correct.total++;
-								student.counters.correct[q[i].cat]++;
+								student.counters.correct[Q[j].cat]++;
 							}
 							else {
 								//-- incorrect answer
@@ -100,13 +111,103 @@ export default {
 						let schools = (divisions[student.division] = divisions[student.division] || { schools: {}, stats: {} }).schools
 						let students = (schools[student.school] = schools[student.school] || { students: {}, stats: {} }).students;
 						students[student.id] = student;		
-					});
-					//-- print tournament results				
-					console.log(JSON.stringify(tournament,null,3));
+					};
+					/* 					
+						Statistics	
+ 					*/
+					//-- Initialize tournament level stats
+					tournament.stats = {
+						scores: {
+							values: [],
+							std: 0,
+							avg: 0
+						},
+						questions,
+						cats: {},
+						noshow: []
+					}
+					for(let cat in params.Q) {
+						tournament.stats.cats[cat] = 0;
+					}
+					//-- Iterate throught the entire hierarchical structure to populate "stats" attributes
+					for(let divisionKey in tournament.divisions) {
+						let division = tournament.divisions[divisionKey];
+						division.stats.rank = {
+							schools: [],
+							students: []
+						};
+						division.stats.cats = {};
+						for(let cat in params.Q) {
+							division.stats.cats[cat] = 0;
+						}
+						for(let schoolKey in division.schools) {
+							let school = division.schools[schoolKey];
+							school.stats.rank = [];
+							school.stats.cats = {};
+							for(let cat in params.Q) {
+								school.stats.cats[cat] = 0;
+							}
+							for(let studentKey in school.students) {
+								let student = school.students[studentKey];
+								tournament.stats.scores.values.push(student.score);
+								school.stats.rank.push({
+									id: student.id,
+									score: student.score
+								});
+								division.stats.rank.students.push({
+									name: student.name,
+									school: schoolKey,
+									score: student.score
+								})
+								for(let cat in params.Q) {
+									school.stats.cats[cat] += student.counters.correct[cat];
+								}
+							}
+							school.stats.rank = school.stats.rank.sort((a,b) => b.score - a.score);
+							school.stats.top4 = school.stats.rank.slice(0,4).reduce((a,i) => a + i.score, 0);
+							division.stats.rank.schools.push({
+								school: schoolKey,
+								score: school.stats.top4
+							})
+							for(let cat in params.Q) {
+								school.stats.cats[cat] /= school.stats.rank.length * tournament.stats.questions[cat] / 100;
+								division.stats.cats[cat] += school.stats.cats[cat];
+							}
+						}
+						division.stats.rank.schools = division.stats.rank.schools.sort((a,b) => b.score - a.score);
+						division.stats.rank.students = division.stats.rank.students.sort((a,b) => b.score - a.score);
+						for(let cat in params.Q) {
+							division.stats.cats[cat] /= Object.keys(division.schools).length;
+							tournament.stats.cats[cat] += division.stats.cats[cat];
+						}						
+					}
+					for(let cat in params.Q) {
+						tournament.stats.cats[cat] /= Object.keys(tournament.divisions).length;
+					}
+					//-- Tournament stats finalization
+					let avg = tournament.stats.scores.values.reduce((a,i) => a + i, 0) / tournament.stats.scores.values.length;
+					let std = Math.sqrt(tournament.stats.scores.values.reduce((a,i) => a + Math.pow(i - avg, 2), 0) / tournament.stats.scores.values.length);
+					tournament.stats.scores.avg = avg;
+					tournament.stats.scores.std = std;
+					//-- No-show
+					for(let r in R) {
+						for(let i=0; i<R[r].team.names.length; i++) {
+							let id = sprintf("%s%02d",r,i);
+							if(show.indexOf(id) === -1) {
+								tournament.stats.noshow.push({
+									id,
+									name: R[r].team.names[i],
+									school: R[r].school.name,
+									division: R[r].school.division
+								})
+							}
+						}
+					}
 					//-- Display the rror log
 					if(this.log.length) {
 						console.log(this.log.join('\n'));
 					}
+					console.log(tournament);
 				}
 			})
 			.catch(error => {

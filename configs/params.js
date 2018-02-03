@@ -5,3 +5,5 @@ export const Q = {
 	TRIG: "Trigonometry",
 	MISC: "Miscellaneous"
 };
+
+export const studentsPerTeam = 8;
