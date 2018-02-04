@@ -1,7 +1,9 @@
 const SET_IS_ADMIN = 'SET_IS_ADMIN';
 const SET_EMAIL = 'SET_EMAIL';
+const SET_TOURNAMENT = 'SET_TOURNAMENT';
 
 export default {
 	SET_IS_ADMIN,
 	SET_EMAIL,
+	SET_TOURNAMENT
 };

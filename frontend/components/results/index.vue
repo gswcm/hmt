@@ -1,25 +1,44 @@
 <template>
 	<div class="p-4">
-		<b-btn variant="outline-dark" @click="refresh">Refresh</b-btn>
+		<div class="d-flex justify-content-center">
+			<h4>Tournament results are categorized and displayed below</h4>
+		</div>
+		<b-tabs  pills card class="mt-3">
+			<b-tab title="Tournament" active><tournament v-if="tournament"/></b-tab>
+			<b-tab title="Divisions"></b-tab>
+			<b-tab title="Schools"></b-tab>
+			<b-tab title="Bulk"></b-tab>
+			<b-tab v-if="isAdmin" title="Log" title-item-class="ml-auto"></b-tab>
+		</b-tabs>
 	</div>
 </template>
 
 <script>
 import { pick } from "lodash";
 import { sprintf } from "sprintf-js";
+import { mapGetters } from 'vuex';
 import * as params from "../../../configs/params"
+import tournament from "./tournament.vue";
+import types from '../../store/mutations';
 export default {
 	props: {
 	},
 	data: () => ({
-		Q: [],
-		R: [],
-		S: [],
-		log: []
+		log: [],
 	}),
+	components: {
+		tournament
+	},
 	created() {
+		this.refresh();
 	},
 	watch: {
+	},
+	computed: {
+		...mapGetters({
+			isAdmin: 'getIsAdmin',
+			tournament: 'getTournament'
+		}),
 	},
 	methods: {
 		refresh() {
@@ -34,10 +53,13 @@ export default {
 				else {
 					this.log = [];
 					let {R,Q,S} = {...response.data.rqs};
-					let questions = {};
+					let questions = {
+						lengths: {},
+						origin: Q
+					};
 					//-- inject statistics object into each question and calculate number of questions in each category
 					for(let q of Q) {
-						questions[q.cat] = (questions[q.cat] || 0) + 1
+						questions.lengths[q.cat] = (questions.lengths[q.cat] || 0) + 1
 						q.counters = {
 							0: 0,
 							1: 0,
@@ -170,7 +192,7 @@ export default {
 								score: school.stats.top4
 							})
 							for(let cat in params.Q) {
-								school.stats.cats[cat] /= school.stats.rank.length * tournament.stats.questions[cat] / 100;
+								school.stats.cats[cat] /= school.stats.rank.length * tournament.stats.questions.lengths[cat] / 100;
 								division.stats.cats[cat] += school.stats.cats[cat];
 							}
 						}
@@ -205,9 +227,10 @@ export default {
 					}
 					//-- Display the rror log
 					if(this.log.length) {
-						console.log(this.log.join('\n'));
+						console.err(this.log.join('\n'));
 					}
-					console.log(tournament);
+					this.$store.commit(types.SET_TOURNAMENT, tournament);
+					// console.log(Q);
 				}
 			})
 			.catch(error => {
@@ -221,3 +244,8 @@ export default {
 };
 </script>
 
+<style lang="scss" scoped>
+	h4 {
+		text-shadow: 1px 1px 2px #ccc;
+	}
+</style>
