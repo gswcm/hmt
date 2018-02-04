@@ -8,7 +8,7 @@
 			<b-tab title="Divisions"></b-tab>
 			<b-tab title="Schools"></b-tab>
 			<b-tab title="Bulk"></b-tab>
-			<b-tab v-if="isAdmin" title="Log" title-item-class="ml-auto"></b-tab>
+			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
 	</div>
 </template>
@@ -19,6 +19,7 @@ import { sprintf } from "sprintf-js";
 import { mapGetters } from 'vuex';
 import * as params from "../../../configs/params"
 import tournament from "./tournament.vue";
+import logs from "./logs.vue";
 import types from '../../store/mutations';
 export default {
 	props: {
@@ -27,7 +28,7 @@ export default {
 		log: [],
 	}),
 	components: {
-		tournament
+		tournament, logs
 	},
 	created() {
 		this.refresh();
