@@ -1,7 +1,7 @@
 <template>
 	<div class="p-3">
 		<div class="d-flex justify-content-center">
-			<h4>Tournament results are categorized and displayed below</h4>
+			<h4 @click="refresh"> Tournament results are categorized and displayed below</h4>
 		</div>
 		<b-tabs  pills card class="mt-3">
 			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T</span>"><tournament v-if="tournament"/></b-tab>
@@ -54,7 +54,6 @@ export default {
 					throw error;
 				} 
 				else {
-					this.log = [];
 					let {R,Q,S} = {...response.data.rqs};
 					let questions = {
 						lengths: {},
@@ -77,6 +76,7 @@ export default {
 						Scantron records
 					*/
 					let tournament = null;
+					let log = [];
 					let show = [];
 					for(let i=0; i<S.length; i++) {				
 						let id = S[i].substr(0,4);
@@ -84,14 +84,18 @@ export default {
 						let seq = id.substr(0,2);
 						//-- Populate 'Student' object based on identified ID
 						if(!(seq in R)) {
-							this.log.push(`Scan parsing: incorrect ID in '${S[i]}' registration record '${seq}' is invalid`);
+							log.push(`Incorrect registration record '${S[i]}', i.e. '${seq}' in '${id}' is an invalid school identity`);
 							continue;
 						}
-						show.push(id);
+						show.push(id);						
 						let reg = R[seq];
 						//-- Teams with more than 8 members (params.studentsPerTeam) must be split to introduce ALT teams
 						let schoolName = reg.school.name
 						let studentIndexInSchool = parseInt(id.substr(2,2))
+						if(studentIndexInSchool >= reg.team.names.length) {
+							log.push(`Incorrect registration record '${S[i]}', i.e. '${id.substr(2,2)}' in '${id}' references non-existent student`);
+							continue;
+						}
 						if(studentIndexInSchool >= params.studentsPerTeam) {
 							schoolName = `${schoolName} ALT${Math.floor(studentIndexInSchool/params.studentsPerTeam)}`
 						}
@@ -228,12 +232,9 @@ export default {
 							}
 						}
 					}
-					//-- Display the rror log
-					if(this.log.length) {
-						console.err(this.log.join('\n'));
-					}
+					//-- Store the log
+					tournament.log = log;
 					this.$store.commit(types.SET_TOURNAMENT, tournament);
-					// console.log(Q);
 				}
 			})
 			.catch(error => {

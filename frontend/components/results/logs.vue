@@ -1,5 +1,17 @@
 <template>
-	<div class="p-sm-3">
+	<div class="p-sm-3">		
+		<h5 class="" v-show="t.log.length">
+			Processing log
+		</h5>
+		<b-table 
+			class="mt-3 mb-5"
+			v-show="t.log.length"
+			:fields="[{key:'idx', label: '#'}, {key:'item', label: 'Log entry'}]"
+			:items="t.log.map((e,i) => ({idx: i+1, item: e}))" 
+			responsive="sm"
+			head-variant="dark"
+			striped
+			small/>
 		<h5 class="">
 			No-show participants
 		</h5>

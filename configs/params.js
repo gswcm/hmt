@@ -25,18 +25,7 @@ export const D = {
 			"GHSA AAAAAA",
 			"GHSA AAAAAAA",
 		]
-	},
-	all: [
-		"GISA AA",
-		"GISA AAA",
-		"GHSA A",
-		"GHSA AA",
-		"GHSA AAA",
-		"GHSA AAAA",
-		"GHSA AAAAA",
-		"GHSA AAAAAA",
-		"GHSA AAAAAAA",
-	]
+	}
 };
 
 export const studentsPerTeam = 8;

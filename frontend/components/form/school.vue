@@ -34,24 +34,14 @@
 						<label>School division<span class="text-danger">*</span></label>
 					</b-col>
 					<b-col col sm>
-						<b-select
+						<b-select 
 							:value="runtime.value.division"
 							:state="state(runtime.status.division)"
 							:disabled="ro"
 							@input="update([],'division',$event)">
 							<option :value="null">Please select the school division</option>
-							<optgroup label="GISA (private schools)">	
-								<option value="GISA AA">GISA AA</option>
-								<option value="GISA AAA">GISA AAA</option>
-							</optgroup>
-							<optgroup label="GHSA (public schools)">	
-								<option value="GHSA A">GHSA A</option>
-								<option value="GHSA AA">GHSA AA</option>
-								<option value="GHSA AAA">GHSA AAA</option>
-								<option value="GHSA AAAA">GHSA AAAA</option>
-								<option value="GHSA AAAAA">GHSA AAAAA</option>
-								<option value="GHSA AAAAAA">GHSA AAAAAA</option>
-								<option value="GHSA AAAAAAA">GHSA AAAAAAA</option>
+							<optgroup v-for="optionGroup in Object.keys(options)" :key="optionGroup" :label="options[optionGroup].label">
+								<option v-for="option in options[optionGroup].values" :value="option" :key="option">{{option}}</option>
 							</optgroup>
 						</b-select>
 					</b-col>
@@ -63,6 +53,7 @@
 
 <script>
 const { cloneDeep } = require("lodash");
+import * as params from "../../../configs/params";
 export default {
 	props: {
 		value: Object,
@@ -78,6 +69,11 @@ export default {
 		},
 		status: false,
 	}),
+	computed: {
+		options() {
+			return params.D;
+		}
+	},
 	created() {
 		this.runtime.value = cloneDeep(this.value);
 		Object.keys(this.runtime.value).forEach(key => {

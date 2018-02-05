@@ -7,11 +7,8 @@
 			<b-col>
 				<b-select v-model="division">
 					<option :value="null">Please select the school division</option>
-					<optgroup :label="options.GISA.label">	
-						<option v-for="option in options.GISA.values" :value="option" :key="option">{{option}}</option>
-					</optgroup>
-					<optgroup :label="options.GHSA.label">	
-						<option v-for="option in options.GHSA.values" :value="option" :key="option">{{option}}</option>
+					<optgroup v-for="optionGroup in Object.keys(options)" :key="optionGroup" :label="options[optionGroup].label">
+						<option v-for="option in options[optionGroup].values" :disabled="!(option in t.divisions)" :value="option" :key="option">{{option}}</option>
 					</optgroup>
 				</b-select>
 			</b-col>

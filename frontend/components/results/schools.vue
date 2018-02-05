@@ -10,11 +10,8 @@
 					<b-col>
 						<b-select v-model="division">
 							<option :value="null">Please select the school division</option>
-							<optgroup :label="divisions.GISA.label">	
-								<option v-for="option in divisions.GISA.values" :value="option" :key="option">{{option}}</option>
-							</optgroup>
-							<optgroup :label="divisions.GHSA.label">	
-								<option v-for="option in divisions.GHSA.values" :value="option" :key="option">{{option}}</option>
+							<optgroup v-for="optionGroup in Object.keys(divisions)" :key="optionGroup" :label="divisions[optionGroup].label">
+								<option v-for="option in divisions[optionGroup].values" :disabled="!(option in t.divisions)" :value="option" :key="option">{{option}}</option>
 							</optgroup>
 						</b-select>
 					</b-col>
@@ -99,7 +96,7 @@ export default {
 			let fields = [
 				{
 					key: 'type',
-					label: ''
+					label: '&nbsp;'
 				}
 			];
 			let itemsProps = {
