@@ -39,7 +39,7 @@
 				<h5>{{school}} ({{division}})</h5>
 			</div>
 			<p class="text-justify">
-				The <strong>score</strong> is computed using the formula <strong>4C - I + 40</strong>, where <strong>C</strong> represents the number of correct responses and <strong>I</strong> represents the number of incorrect responses. Incomplete erasures and multiple marks are scored as incorrect responses. Blank responses do not affect the score. 
+				The <strong>score</strong> is computed using the formula <strong>4C - I + 40</strong>, where <strong>C</strong> represents the number of correct responses and <strong>I</strong> represents the number of incorrect responses. Multiple marks are scored as incorrect responses. Blank responses do not affect the score. 
 			</p>
 			<h5 class="mt-5">School's statistics per question category, %</h5>
 			<b-table 
