@@ -6,8 +6,8 @@
 		<b-tabs  pills card class="mt-3">
 			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T</span>"><tournament v-if="tournament"/></b-tab>
 			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D</span>" v-if="tournament"><divisions/></b-tab>
-			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>" v-if="tournament"></b-tab>
-			<b-tab title="Bulk" v-if="tournament"></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>" v-if="tournament"><schools/></b-tab>
+			<b-tab title="Bulk" v-if="isAdmin && tournament"></b-tab>
 			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
 	</div>
@@ -20,6 +20,7 @@ import { mapGetters } from 'vuex';
 import * as params from "../../../configs/params"
 import tournament from "./tournament.vue";
 import divisions from "./divisions.vue";
+import schools from "./schools.vue";
 import logs from "./logs.vue";
 import types from '../../store/mutations';
 export default {
@@ -29,7 +30,7 @@ export default {
 		log: [],
 	}),
 	components: {
-		tournament, divisions, logs
+		tournament, divisions, schools, logs
 	},
 	created() {
 		this.refresh();

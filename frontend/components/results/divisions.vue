@@ -1,10 +1,10 @@
 <template>
 	<div class="p-sm-3">
 		<b-row align-v="center">
-			<b-col cols="12" sm="auto">
-				<label>School division</label>
+			<b-col cols="12">
+				<label><strong>Division</strong></label>
 			</b-col>
-			<b-col col sm>
+			<b-col>
 				<b-select v-model="division">
 					<option :value="null">Please select the school division</option>
 					<optgroup :label="options.GISA.label">	
@@ -119,6 +119,7 @@ export default {
 				{
 					key: 'top4',
 					label: 'Top4 score',
+					thClass: 'nowrap',
 				}
 			];
 			return {items,fields};	
@@ -156,11 +157,6 @@ export default {
 			return {items,fields};	
 		},
 	},
-	mounted() {
-		console.log(this.t);
-	},
-	methods: {
-	}
 };
 </script>
 
