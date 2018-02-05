@@ -1,7 +1,7 @@
 <template>
-	<div class="p-sm-3">
-		<b-row>
-			<b-col cols="12" sm="5">
+	<div class="p-sm-3 d-print">
+		<b-row class="d-print-none">
+			<b-col cols="12" sm="auto">
 				<b-row align-v="center">
 					<!-- Division -->
 					<b-col cols="12">
@@ -17,15 +17,14 @@
 					</b-col>
 				</b-row>
 			</b-col>
-			<b-col cols="12" sm="7" class="mt-3 mt-sm-0">
+			<b-col cols="12" sm="" class="mt-3 mt-sm-0">
 				<b-row>
 					<!-- School -->
 					<b-col cols="12">
 						<label><strong>School</strong></label>
 					</b-col>
 					<b-col>
-						<b-select v-model="school" :options="schools">
-						</b-select>
+						<b-select v-model="school" :options="schools"/>
 					</b-col>
 				</b-row>
 			</b-col>
@@ -48,6 +47,24 @@
 				striped
 				hover>
 			</b-table>
+			<h5 class="mt-5">Students' statistics per question category (# of correct answers / # of questions)</h5>
+			<b-table 
+				class="mt-3"
+				:fields="tableStudents.fields" 
+				:items="tableStudents.items" 
+				responsive="sm"
+				head-variant="dark"
+				striped
+				hover>
+			</b-table>
+			<h5 class="mt-5">Top4 score </h5>
+			<div variant="light" class="panel p-0 d-flex justify-content-center align-items-center">
+				<span class="banner">{{t.divisions[division].schools[school].stats.top4}}</span>
+			</div>
+			<h5 class="mt-3">Ciphering total</h5>
+			<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
+			<h5 class="mt-3">Match total</h5>
+			<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
 		</div>
 		<b-alert v-else show variant="warning" class="mt-3">
 			No records found
@@ -125,10 +142,54 @@ export default {
 				items = [itemsProps.school, itemsProps.division, itemsProps.tournament];
 			}
 			return {items, fields}
+		},
+		tableStudents() {
+			// Fields
+			let fields = [
+				{
+					key: 'name',
+					label: 'Name',
+					sortable: true,
+					tdClass: 'nowrap'
+				},
+				{
+					key: 'score',
+					label: 'Score',
+					sortable: true
+				}
+			];
+			for(let cat of Object.keys(params.Q)) {
+				fields.push({
+					key: cat,
+					label: cat	
+				});
+			}
+			fields.push({
+				key: 'total',
+				label: 'Total'	
+			})
+			// Items
+			let items = [];
+			if(this.school && this.division) {
+				let students = this.t.divisions[this.division].schools[this.school].students;
+				items = Object.keys(students).map((e,i) => {
+					let student = students[e];
+					let result = {
+						name: student.name,
+						score: student.score,
+					}
+					for(let cat of Object.keys(params.Q)) {
+						result[cat] = `${student.counters.correct[cat]}/${this.t.stats.questions.lengths[cat]}`;
+					}
+					result.total = `${student.counters.correct.total}/${Object.keys(this.t.stats.questions.lengths).reduce((a,i) => a + this.t.stats.questions.lengths[i],0)}`;
+					return result;
+				}).sort((a,b) => b.score - a.score);
+			}
+			return {fields, items};
 		}
 	},
 	mounted() {
-		console.log(this.t);
+		// console.log(this.t);
 	},
 };
 </script>
@@ -147,5 +208,14 @@ h5 {
 }
 .nowrap {
 	white-space: nowrap;
+}
+.banner {
+	font-size: xx-large;
+	font-weight: bold;
+}
+.panel {
+	height: 5em;
+	border: 1px solid black;
+	border-radius: 10px;
 }
 </style>

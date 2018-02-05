@@ -1,12 +1,12 @@
 <template>
 	<div class="p-3">
-		<div class="d-flex justify-content-center">
+		<div class="d-flex justify-content-center d-print-none">
 			<h4 @click="refresh"> Tournament results are categorized and displayed below</h4>
 		</div>
 		<b-tabs  pills card class="mt-3">
 			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T</span>"><tournament v-if="tournament"/></b-tab>
 			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D</span>" v-if="tournament"><divisions/></b-tab>
-			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>" v-if="tournament"><schools/></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>" v-if="tournament"><schools class=""/></b-tab>
 			<b-tab title="Bulk" v-if="isAdmin && tournament"></b-tab>
 			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
@@ -253,5 +253,10 @@ export default {
 <style lang="scss" scoped>
 	h4 {
 		text-shadow: 1px 1px 2px #ccc;
+	}
+	@media print {
+		body {
+			width: 900px;
+		}
 	}
 </style>

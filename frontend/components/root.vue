@@ -1,6 +1,6 @@
 <template>
 	<div class="root">
-		<b-navbar sticky toggleable="md" type="dark" variant="dark">
+		<b-navbar sticky toggleable="md" type="dark" variant="dark" class="d-print-none">
 			<b-nav-toggle target="nav_collapse"></b-nav-toggle>
 			<b-navbar-brand to="/">
 				<span class="d-none d-md-inline-block">
