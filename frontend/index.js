@@ -71,7 +71,7 @@ const router = new vueRouter({
 			path: '/results',
 			component: () =>
 				import(/* webpackChunkName: 'start' */ './components/results/index.vue'),
-			alias: '/stats'
+			alias: ['/stats','/stat','/report']
 		},
 		{
 			path: '/email',
