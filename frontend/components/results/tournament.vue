@@ -1,11 +1,10 @@
 <template>
-	<div class="p-3">
+	<div class="p-sm-3">
 		<h5>
 			Participants
 		</h5>
-		<hr>
 		<p class="pl-3">
-			There have been <strong> {{t.stats.scores.values.length}} participants</strong> who submitted their Scantron sheets for processing.  Their <strong>average score</strong> was <strong>{{t.stats.scores.avg.toFixed(2)}}</strong> out of possible 200. The standard <strong>deviation</strong> was <strong>{{t.stats.scores.std.toFixed(2)}}</strong>.
+			There have been <strong> {{t.stats.scores.values.length}} participants</strong> who submitted their Scantron sheets for processing.  Their <strong>average score</strong> was <strong>{{t.stats.scores.avg.toFixed(2)}}</strong> out of possible 200 <strong>standard deviation</strong> was <strong>{{t.stats.scores.std.toFixed(2)}}</strong>
 		</p>
 		<h5 class="mt-5">
 			Per-question statistics
@@ -51,7 +50,8 @@ export default {
 		fields: [
 			{
 				key: 'index',
-				label: 'Question'
+				label: 'Question',
+				sortable: true,
 			},
 			{
 				key: 'blank',
@@ -85,11 +85,13 @@ export default {
 			{
 				key: 'cat',
 				label: 'Category',
-				tdClass: 'nowrap'
+				tdClass: 'nowrap',
+				sortable: true
 			},
 			{
 				key: 'percent',
-				label: 'Percent'
+				label: 'Percent',
+				sortable: true
 			}
 		],
 	}),

@@ -1,13 +1,13 @@
 <template>
-	<div class="p-4">
+	<div class="p-3">
 		<div class="d-flex justify-content-center">
 			<h4>Tournament results are categorized and displayed below</h4>
 		</div>
 		<b-tabs  pills card class="mt-3">
-			<b-tab title="Tournament" active><tournament v-if="tournament"/></b-tab>
-			<b-tab title="Divisions"></b-tab>
-			<b-tab title="Schools"></b-tab>
-			<b-tab title="Bulk"></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T</span>"><tournament v-if="tournament"/></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D</span>" v-if="tournament" active><divisions/></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>" v-if="tournament"></b-tab>
+			<b-tab title="Bulk" v-if="tournament"></b-tab>
 			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
 	</div>
@@ -19,6 +19,7 @@ import { sprintf } from "sprintf-js";
 import { mapGetters } from 'vuex';
 import * as params from "../../../configs/params"
 import tournament from "./tournament.vue";
+import divisions from "./divisions.vue";
 import logs from "./logs.vue";
 import types from '../../store/mutations';
 export default {
@@ -28,7 +29,7 @@ export default {
 		log: [],
 	}),
 	components: {
-		tournament, logs
+		tournament, divisions, logs
 	},
 	created() {
 		this.refresh();

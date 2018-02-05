@@ -1,5 +1,5 @@
 <template>
-	<div class="p-3">
+	<div class="p-sm-3">
 		<h5 class="">
 			No-show participants
 		</h5>
