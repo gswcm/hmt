@@ -41,7 +41,7 @@
 		<b-alert v-if="showForm && isAdmin" show variant="info" class="my-3 py-3 rounded"> 
 			<h4  class="mb-3">Welcome, Administrator!</h4>
 			<p class="text-justify">
-				The registration form is hidden for you because your account is associated with administrative privilege. You can access admin interface by clicking <router-link to="/admin">Admin</router-link> link in the navigation bar up top. 
+				The registration form is hidden for you because your account is associated with administrative privilege. You can access admin interface by following <router-link to="/admin">this</router-link> link or simply pressing "Enter" key. 
 			</p>
 			<p class="text-justify">
 				Please note that should you decide to walk through the registration process, your info will not be included into reports... because you are not a real user.

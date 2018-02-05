@@ -148,7 +148,7 @@ export default {
 			}
 			this.timer = setTimeout( () => {
 				this.timer = null;
-			}, 1000)
+			}, 2000)
 			//-- update the array of lines
 			this.evalData = this.s2a(value, true);
 		},

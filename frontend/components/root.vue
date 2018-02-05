@@ -14,7 +14,7 @@
 			</b-navbar-brand>
 			<b-collapse is-nav id="nav_collapse">
 				<b-navbar-nav class="ml-auto">
-					<b-nav-item v-if="isAdmin" to="/admin" >Admin</b-nav-item>
+					<b-nav-item href="/stats">Results</b-nav-item>
 					<b-nav-item href="/about">About</b-nav-item>
 				</b-navbar-nav>
 			</b-collapse>
