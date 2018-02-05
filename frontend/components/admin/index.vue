@@ -1,5 +1,5 @@
 <template>
-	<b-container fluid v-if="isAdmin">
+	<b-container fluid>
 		<b-form @submit.prevent="credentialChecker">
 			<b-form-group :class="['login', 'my-3', 'p-3', 'bg-warning', 'rounded']">
 				<b-row>
@@ -92,7 +92,7 @@ export default {
 		records, questions, scantron, maintenance, results
 	},
 	created() {
-		this.credentials.email = this.email;
+		this.credentials.email = this.email || '';
 		this.credentialChecker();
 	},
 	mounted() {
@@ -105,13 +105,13 @@ export default {
 			});
 		}
 	},
-	beforeRouteEnter(to, from, next) {
-		next(vm => {
-			if(!vm.isAdmin) {
-				vm.$router.replace('/start');
-			}
-		});
-	},
+	// beforeRouteEnter(to, from, next) {
+	// 	next(vm => {
+	// 		if(!vm.isAdmin) {
+	// 			vm.$router.replace('/start');
+	// 		}
+	// 	});
+	// },
 	computed: {
 		...mapGetters({
 			isAdmin: "getIsAdmin",

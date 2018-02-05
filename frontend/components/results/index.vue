@@ -75,8 +75,11 @@ export default {
 					/* 
 						Scantron records
 					*/
-					let tournament = null;
-					let log = [];
+					let tournament = { 
+						divisions: {}, 
+						stats: {},
+						log: []
+					};
 					let show = [];
 					for(let i=0; i<S.length; i++) {				
 						let id = S[i].substr(0,4);
@@ -84,7 +87,7 @@ export default {
 						let seq = id.substr(0,2);
 						//-- Populate 'Student' object based on identified ID
 						if(!(seq in R)) {
-							log.push(`Incorrect registration record '${S[i]}', i.e. '${seq}' in '${id}' is an invalid school identity`);
+							tournament.log.push(`Incorrect registration record '${S[i]}', i.e. '${seq}' in '${id}' is an invalid school identity`);
 							continue;
 						}
 						show.push(id);						
@@ -93,7 +96,7 @@ export default {
 						let schoolName = reg.school.name
 						let studentIndexInSchool = parseInt(id.substr(2,2))
 						if(studentIndexInSchool >= reg.team.names.length) {
-							log.push(`Incorrect registration record '${S[i]}', i.e. '${id.substr(2,2)}' in '${id}' references non-existent student`);
+							tournament.log.push(`Incorrect registration record '${S[i]}', i.e. '${id.substr(2,2)}' in '${id}' references non-existent student`);
 							continue;
 						}
 						if(studentIndexInSchool >= params.studentsPerTeam) {
@@ -136,7 +139,7 @@ export default {
 						//-- Calculate student's score
 						student.score = 4 * student.counters.correct.total - student.counters.incorrect + 40;
 						//-- Store student's record in tournament result structure
-						let divisions = (tournament = tournament || { divisions: {}, stats: {} }).divisions;
+						let divisions = tournament.divisions;
 						let schools = (divisions[student.division] = divisions[student.division] || { schools: {}, stats: {} }).schools
 						let students = (schools[student.school] = schools[student.school] || { students: {}, stats: {} }).students;
 						students[student.id] = student;		
@@ -232,8 +235,7 @@ export default {
 							}
 						}
 					}
-					//-- Store the log
-					tournament.log = log;
+					//-- Post the changes into VUEX store					
 					this.$store.commit(types.SET_TOURNAMENT, tournament);
 				}
 			})
