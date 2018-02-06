@@ -17,7 +17,7 @@
 		</h5>
 		<b-input-group>
 			<b-form-input :value="filter" @input="filterUpdate" placeholder="Filter by 'id' or 'name'" />
-			<b-input-group-button>
+			<b-input-group-button name="btn-clear">
 				<b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
 			</b-input-group-button>
 		</b-input-group>

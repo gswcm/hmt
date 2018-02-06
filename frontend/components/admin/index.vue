@@ -1,6 +1,6 @@
 <template>
 	<b-container fluid>
-		<b-form @submit.prevent="credentialChecker">
+		<b-form @submit.prevent="credentialChecker" class="d-print-none">
 			<b-form-group :class="['login', 'my-3', 'p-3', 'bg-warning', 'rounded']">
 				<b-row>
 					<b-col cols="12" md>

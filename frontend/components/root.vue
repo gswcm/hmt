@@ -51,9 +51,9 @@
 			margin-top: 0mm;
 		}
 		.root {
-			/* width: 800px; */
 		}
-		.card-header {
+		.card-header,
+		.nav-tabs {
 			display: none;
 		}
 		.page-no-break-inside {
