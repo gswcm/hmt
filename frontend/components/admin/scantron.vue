@@ -58,15 +58,8 @@
 				@click="evalData = []">
 				<!-- Clear list of records -->
 				<font-awesome-icon :icon="['fas', 'list']"/>
-				<span class="ml-2">Clear</span>
-			
-			</b-btn>
-			<b-btn 
-				variant="outline-dark" 
-				class="col-5 col-sm-auto ml-auto ml-sm-3 mt-3 order-3 order-sm-5" 
-				@click="Boo">
-				Boo
-			</b-btn>
+				<span class="ml-2">Clear</span>			
+			</b-btn>			
 		</div>
 		<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
 			<p>
@@ -131,9 +124,6 @@ export default {
 		}
 	},
 	methods: {
-		Boo() {
-			this.$socket.emit('scanData','0301 1111111111111111111222222222222222223333 00000');
-		},
 		s2a(s, strict = false) {
 			s = s.replace(/[^0-9A-Z\n]/g,'');
 			if(strict) {
