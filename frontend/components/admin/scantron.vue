@@ -74,7 +74,6 @@ import { debounce } from 'lodash';
 export default {
 	sockets: {
 		addScanData(data) {
-			console.log(data);
 			if(typeof data === 'string') {
 				this.evalData.push(data.replace(/[^A-Z0-9]/g,''));
 			}
