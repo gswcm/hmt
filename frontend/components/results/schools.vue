@@ -1,6 +1,6 @@
 <template>
-	<div class="p-sm-3 d-print">
-		<b-row class="d-print-none">
+	<div class="p-sm-3" ref="schools">
+		<b-row class="d-print-none mb-4">
 			<b-col cols="12" sm="auto">
 				<b-row align-v="center">
 					<!-- Division -->
@@ -30,9 +30,11 @@
 			</b-col>
 		</b-row>
 		<!-- Main display -->
-		<div v-if="school" class="mt-5">
-			<div class="d-flex justify-content-center p-3" >
-				<h5>{{school}} ({{division}})</h5>
+		<div v-if="school" class="mt-3">
+			<div class="d-none d-print-block">
+				<div class="d-flex justify-content-center p-5 d-print-flex">
+					<h3>{{school}} ({{division}})</h3>
+				</div>
 			</div>
 			<p class="text-justify">
 				The <strong>score</strong> is computed using the formula <strong>4C - I + 40</strong>, where <strong>C</strong> represents the number of correct responses and <strong>I</strong> represents the number of incorrect responses. Multiple marks are scored as incorrect responses. Blank responses do not affect the score. 
@@ -49,7 +51,7 @@
 			</b-table>
 			<h5 class="mt-5">Students' statistics per question category (# of correct answers / # of questions)</h5>
 			<b-table 
-				class="mt-3"
+				class="mt-3 page-no-break-inside"
 				:fields="tableStudents.fields" 
 				:items="tableStudents.items" 
 				responsive="sm"
@@ -57,16 +59,22 @@
 				striped
 				hover>
 			</b-table>
-			<h5 class="mt-5">Top4 score </h5>
-			<div variant="light" class="panel p-0 d-flex justify-content-center align-items-center">
-				<span class="banner">{{t.divisions[division].schools[school].stats.top4}}</span>
+			<div class="page-no-break-inside">
+				<h5 class="mt-5">Top4 score </h5>
+				<div variant="light" class="panel p-0 d-flex justify-content-center align-items-center">
+					<span class="banner">{{t.divisions[division].schools[school].stats.top4}}</span>
+				</div>
 			</div>
-			<h5 class="mt-3">Ciphering total</h5>
-			<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
-			<h5 class="mt-3">Match total</h5>
-			<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
+			<div class="page-no-break-inside">
+				<h5 class="mt-3">Ciphering total</h5>
+				<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
+			</div>
+			<div class="page-no-break-inside">
+				<h5 class="mt-3">Match total</h5>
+				<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
+			</div>
 		</div>
-		<b-alert v-else show variant="warning" class="mt-3">
+		<b-alert v-else show variant="warning">
 			No records found
 		</b-alert>
 	</div>
@@ -190,6 +198,7 @@ export default {
 	},
 	mounted() {
 		// console.log(this.t);
+		// console.log('--------',this.$refs);
 	},
 };
 </script>

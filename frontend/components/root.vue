@@ -42,5 +42,29 @@
 	.root {
 		min-width: 420px;
 	}
+	@media print {
+		@page {			
+			margin: 0mm;  /* this affects the margin in the printer settings */
+			margin-top: 10mm;
+		}
+		@page :first {			
+			margin-top: 0mm;
+		}
+		.root {
+			/* width: 800px; */
+		}
+		.card-header {
+			display: none;
+		}
+		.page-no-break-inside {
+			page-break-inside: avoid;
+		}
+		.page-no-break-after {
+			page-break-after: always;
+		}
+		.page-no-break-before {
+			page-break-before: always;
+		}
+	}
 </style>
 

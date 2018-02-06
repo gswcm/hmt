@@ -254,9 +254,4 @@ export default {
 	h4 {
 		text-shadow: 1px 1px 2px #ccc;
 	}
-	@media print {
-		body {
-			width: 900px;
-		}
-	}
 </style>
