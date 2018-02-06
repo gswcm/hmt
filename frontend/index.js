@@ -10,6 +10,7 @@ import vue from 'vue';
 import vueRouter from 'vue-router';
 import vueNoty from 'vuejs-noty';
 import vueClipboard from 'vue-clipboard2';
+import vueSocketio from 'vue-socket.io';
 import axios from 'axios';
 import vueAxios from 'vue-axios';
 import fontawesome from '@fortawesome/fontawesome';
@@ -55,6 +56,9 @@ fontawesome.library.add(
 	faFilter
 );
 
+//-- Socket.io client
+
+
 const router = new vueRouter({
 	routes: [
 		{
@@ -94,6 +98,7 @@ const router = new vueRouter({
 vue.component('font-awesome-icon', fontAwesomeIcon);
 vue.use(bootstrapVue);
 vue.use(vueRouter);
+vue.use(vueSocketio, '/scantron');
 vue.use(vueClipboard);
 vue.use(vueAxios, axios);
 vue.use(vueNoty, {

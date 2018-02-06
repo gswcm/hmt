@@ -27,6 +27,7 @@ mongoose.connection
 })
 .once('open', function(){
 	var server = http.createServer(app);
+	app.get('socketio').listen(server);
 	server.listen(port);
 	server.on('error', onServerError);
 	server.on('listening', function(){

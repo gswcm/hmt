@@ -59,6 +59,13 @@
 				<!-- Clear list of records -->
 				<font-awesome-icon :icon="['fas', 'list']"/>
 				<span class="ml-2">Clear</span>
+			
+			</b-btn>
+			<b-btn 
+				variant="outline-dark" 
+				class="col-5 col-sm-auto ml-auto ml-sm-3 mt-3 order-3 order-sm-5" 
+				@click="Boo">
+				Boo
 			</b-btn>
 		</div>
 		<b-modal id="confirmClearRemote" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="confirmClearRemote">
@@ -72,6 +79,20 @@
 <script>
 import { debounce } from 'lodash';
 export default {
+	sockets: {
+		addScanData(data) {
+			console.log(data);
+			if(typeof data === 'string') {
+				this.evalData.push(data.replace(/[^A-Z0-9]/g,''));
+			}
+			else if(Array.isArray(data)) {
+				this.evalData = this.evalData.concat(data.map(i => i.replace(/[^A-Z0-9]/g,'')));
+			}
+			else {
+				console.error('Incorrect format of the data from scantron (expected string or array of strings)');
+			}
+		}
+	},
 	props: {
 		credentials: Object
 	},
@@ -110,6 +131,9 @@ export default {
 		}
 	},
 	methods: {
+		Boo() {
+			this.$socket.emit('scanData','0301 1111111111111111111222222222222222223333 00000');
+		},
 		s2a(s, strict = false) {
 			s = s.replace(/[^0-9A-Z\n]/g,'');
 			if(strict) {

@@ -23,6 +23,7 @@ exports.devServer = ({ host, port } = {}) => ({
 		contentBase: path.join(__dirname, "build"),
 		proxy: {
 			'/api': 'http://localhost:4000',
+			'/socket.io': 'http://localhost:4000',
 			'/about': 'http://localhost:4000'
 		},
 		host,
