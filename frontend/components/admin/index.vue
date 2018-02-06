@@ -21,11 +21,10 @@
 							</b-col>
 							<b-col col sm>
 								<b-input-group>
-									<b-form-input type="password" ref="password" class="border-right-0" @input="credentialChecker('password',$event)" placeholder="admin's password">
-									</b-form-input>
-									<b-input-group-button slot="right">
+									<b-form-input type="password" ref="password" class="border-right-0" @input="credentialChecker('password',$event)" placeholder="admin's password"/>
+									<template slot="append">
 										<b-btn :disabled="!emailIsValid" variant="outline-dark" class="border-left-0" v-b-modal.passwordRecovery>forgotten...</b-btn>
-									</b-input-group-button>
+									</template>
 								</b-input-group>
 							</b-col>
 						</b-row>
