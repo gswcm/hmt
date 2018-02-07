@@ -4,7 +4,7 @@
 			Participants
 		</h5>
 		<p class="pl-3">
-			There have been <strong> {{t.stats.scores.values.length}} participants</strong> who submitted their Scantron sheets for processing.  <span v-show="t.stats.scores.values.length">Their <strong>average score</strong> was <strong>{{t.stats.scores.avg.toFixed(2)}}</strong> out of possible 200 <strong>standard deviation</strong> was <strong>{{t.stats.scores.std.toFixed(2)}}</strong></span>
+			There have been <strong> {{t.stats.scores.values.length}} participants</strong> who submitted their Scantron sheets for processing.  <span v-show="t.stats.scores.values.length">Their <strong>average score</strong> was <strong>{{t.stats.scores.avg.toFixed(2)}}</strong> out of possible 200. <strong>Standard deviation</strong> was <strong>{{t.stats.scores.std.toFixed(2)}}</strong></span>
 		</p>
 		<h5 class="mt-5">
 			Per-question statistics

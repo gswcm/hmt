@@ -40,6 +40,7 @@
 				<b-btn 
 					variant="outline-dark" 
 					class=""
+					:disabled="!Object.keys(t.divisions).length"
 					@click="printAll">
 					<font-awesome-icon :icon="['fas', 'print']"/>
 					All
