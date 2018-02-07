@@ -7,7 +7,6 @@
 			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T</span>"><tournament v-if="tournament"/></b-tab>
 			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D</span>" v-if="tournament"><divisions/></b-tab>
 			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>" v-if="tournament"><schools class=""/></b-tab>
-			<b-tab title="Bulk" v-if="isAdmin && tournament"></b-tab>
 			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
 	</div>

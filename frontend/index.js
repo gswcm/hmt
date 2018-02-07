@@ -29,7 +29,8 @@ import {
    faDatabase,
    faWrench,
 	faList,
-	faFilter
+	faFilter,
+    faPrint
 } from '@fortawesome/fontawesome-free-solid';
 import bootstrapVue from 'bootstrap-vue';
 import store from './store';
@@ -53,7 +54,8 @@ fontawesome.library.add(
 	faDatabase,
 	faWrench,
 	faList,
-	faFilter
+	faFilter,
+	faPrint
 );
 
 //-- Socket.io client
