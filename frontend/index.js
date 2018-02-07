@@ -73,12 +73,12 @@ const router = new vueRouter({
 			component: () =>
 				import(/* webpackChunkName: 'start' */ './components/start.vue')
 		},
-		{
-			path: '/results',
-			component: () =>
-				import(/* webpackChunkName: 'start' */ './components/results/index.vue'),
-			alias: ['/stats','/stat','/report']
-		},
+		// {
+		// 	path: '/results',
+		// 	component: () =>
+		// 		import(/* webpackChunkName: 'start' */ './components/results/index.vue'),
+		// 	alias: ['/stats','/stat','/report']
+		// },
 		{
 			path: '/email',
 			component: () =>
