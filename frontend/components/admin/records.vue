@@ -130,7 +130,25 @@
 						</p>
 					</b-modal>
 				</b-alert>
-				<registration v-if="reg_filtered !== null" :value="reg_filtered" :options="{ debug: false, ro: true }"/>					
+				<!-- Registration form -->
+				<div v-if="reg_filtered !== null">
+					<registration 
+						:value="reg_filtered" 
+						:options="{
+							debug: false,
+							ro: false,
+						}"
+						@input="activeRegistrationUpdateHandler"/>			
+					<b-btn :disabled="!registration.status" class="" variant="outline-dark" v-b-modal.updateRegistration v-b-tooltip.hover title="Update registration and bypass the confirmation">
+						<font-awesome-icon :icon="['fas', 'edit']"/>
+						Update
+					</b-btn>		
+					<b-modal id="updateRegistration" title="Are you sure?" ok-title="Confirm" cancel-title="Close" @ok="updateRegistration">
+						<p>
+							You are about <strong>update</strong> existing registration for <strong>{{email}}</strong>. Please confirm your will or close this dialog to cancel.
+						</p>
+					</b-modal>
+				</div>
 			</div>
 			<b-alert v-else show variant="warning">
 				<h5>No records found</h5>
@@ -159,6 +177,10 @@ export default {
 	data: () => ({
 		runtime: {
 			credentials: {}
+		},
+		registration: {
+			value: {},
+			status: null
 		},
 		records: [],
 		filter: {
@@ -256,39 +278,74 @@ export default {
 						"_"
 					)}_${seq}_${rec.school.name.replace(/\s+/g, "")}.pdf`
 				);
-			} else {
+			} 
+			else {
 				return doc;
 			}
 		},
 		onCopy() {
 			this.$noty.success(`E-mail copied into clipboard`);
 		},
+		activeRegistrationUpdateHandler(data) {
+			this.registration.value = data.value,
+			this.registration.status = data.status
+		},
+		updateRegistration() {
+			console.log(JSON.stringify(this.registration.value, null, 3));
+			this.axios
+			.post("/api/admin/update", {
+				email: this.email,
+				registration: this.registration.value,
+				credentials: this.runtime.credentials
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.$noty.success(
+						`Registration for ${
+							response.data.email
+						} has been updated`
+					);
+					this.refresh();
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
+		},
 		confirmRegistration() {
 			this.axios
-				.post("/api/admin/confirm", {
-					email: this.email,
-					credentials: this.runtime.credentials
-				})
-				.then(response => {
-					if (response.data.status) {
-						//-- server error
-						let error = response.data.error || new Error("not sure");
-						throw error;
-					} else {
-						this.$noty.success(
-							`Registration for ${
-								response.data.email
-							} has been confirmed`
-						);
-						this.refresh();
-					}
-				})
-				.catch(error => {
-					this.$noty.error(
-						`Something went wrong... more specifically: ${error.message}`
+			.post("/api/admin/confirm", {
+				email: this.email,
+				credentials: this.runtime.credentials
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} else {
+					this.$noty.success(
+						`Registration for ${
+							response.data.email
+						} has been confirmed`
 					);
-					console.error(error.stack);
-				});
+					this.refresh();
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
 		},
 		removeRecord() {
 			this.axios

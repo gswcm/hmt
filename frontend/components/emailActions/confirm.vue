@@ -17,7 +17,7 @@
 				<p>	
 					Please make your <strong>check</strong> payable to <strong>"GSW High School Math Tournament"</strong> and send it to 
 					<address class="ml-3">
-						<strong>Kailash Ghimire</strong><br/>
+						<strong>Kailash Ghimire</strong><br>
 						800 GSW State University Drive<br/>
 						Americus, GA 31709
 					</address>
