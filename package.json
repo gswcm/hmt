@@ -94,6 +94,8 @@
 		"morgan": "^1.9.0",
 		"nodemailer": "^4.4.1",
 		"nodemailer-base64-to-s3": "0.0.4",
+		"serialport": "^6.0.5",
+		"serialport-v4": "^4.0.9",
 		"socket.io": "^2.0.4",
 		"sprintf-js": "^1.1.1",
 		"uuid": "^3.1.0"
