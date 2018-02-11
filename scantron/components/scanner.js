@@ -2,8 +2,9 @@ const serialPort = require("serialport");
 const eventEmitter = require('events');
 
 class Scanner extends eventEmitter {
-	constructor(path) {
+	constructor(path, debug = false) {
 		super();
+		this.debug = debug;
 		this.fsmState = "";
 		this.fsmSubState = 0;
 		this.sheetCounter = 0;
@@ -68,12 +69,20 @@ class Scanner extends eventEmitter {
 		this.write("\x0D\x1BQREV\x0D");	
 	}
 	write(data) {
+		if(this.debug) {
+			console.error('W:', data.split("").map(i => i.charCodeAt(0)));
+		}
 		this.port.write(data, (err) => {
 			if(err) {
 				this.errorHandler(err);
 				return;
 			}
-			this.port.drain();
+			this.port.drain(err => {
+				if(err) {
+					this.errorHandler(err);
+					return;
+				}				
+			});
 		});
 	}
 	static getRandomInt(min, max) {
@@ -82,14 +91,17 @@ class Scanner extends eventEmitter {
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
 	dataHandler(data) {
+		data = data.replace(/\r/g,'');
+		if(this.debug) {
+			console.log(`R:(${this.fsmState})`, data.split("").map(i => i.charCodeAt(0)));
+		}
 		if(data === String.fromCharCode(this.calibDataObj.ERR)) {
 			//-- Error, likely paper jam or incorrect form
 			this.errorHandler(new Error("Paper jam or incorrect form"));			
 			return;
 		}
 		switch(this.fsmState) {
-			case "doReset":
-				console.log(`--${data}--`);
+			case "doReset":				
 				if(data === "") {
 					// NOP
 				}
@@ -99,7 +111,7 @@ class Scanner extends eventEmitter {
 					this.write("\x1BSRST\x0D");
 				}
 				else {
-					this.errorHandler(new Error(`Incorrect data in 'doReset' state, i.e. ${data}`));
+					this.errorHandler(new Error(`Incorrect data in 'doReset' state, i.e. '${data}'`));
 					return;
 				}
 				break;
@@ -177,7 +189,7 @@ class Scanner extends eventEmitter {
 					return;
 				}
 				else if(data.length === this.frmDataLength) {
-					self.emit('data', data);
+					this.emit('data', data);
 					this.sheetCounter++;
 					this.fsmState = "requestData";
 					this.write("\x1BHOPR L\x0D");
@@ -195,9 +207,17 @@ class Scanner extends eventEmitter {
 		this.frmDataLength = 0;
 		this.port
 		.on('error', this.errorHandler.bind(this))
-		.on('open', this.openHandler.bind(this))
+		.on('open', this.openHandler.bind(this));
+		//.on('data', this.dataHandler.bind(this)); 
+		this.port.pipe(new serialPort.parsers.Delimiter(
+			{
+				delimiter: Buffer.from('\r', 'utf8'), 
+				encoding: 'utf8',
+				includeDelimiter: true
+			}
+		))
 		.on('data', this.dataHandler.bind(this));
-		this.port.pipe(new serialPort.parsers.Readline({delimiter: '\x0D'}));
+		
 		this.port.open();
 	}
 }

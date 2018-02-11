@@ -1,6 +1,6 @@
 const Account = require("./models/account");
 
-module.exports = {
+const utils = {
 	evalCredentials: credentials => {
 		let email = credentials.email;
 		let password = credentials.password;
@@ -24,5 +24,13 @@ module.exports = {
 			}
 			return Promise.resolve();
 		});
+	},
+	capitalize: s => {
+		s = s.trim();
+		return (s.length ? s : '--').toLowerCase().split(/\s+/g).map(i => {
+			return i[0].toUpperCase() + i.substr(1);
+		}).join(' ');
 	}
 };
+
+module.exports = utils;

@@ -54,7 +54,7 @@ class Simulator extends eventEmitter {
 		return Math.floor(Math.random() * (max - min)) + min;
 	}
 	dataHandler(data) {
-		data = data.replace("\x1B", "");
+		data = data.replace("\x1B", "").replace(/\r/g,'');
 		switch (this.fsmState) {
 			case "sendName":
 				if (data.length === 0) {
@@ -155,8 +155,14 @@ class Simulator extends eventEmitter {
 		}
 		this.port
 		.on('error', this.errorHandler.bind(this))
-		.on('open', this.openHandler.bind(this))
-		.pipe(new serialPort.parsers.Readline({delimiter: "\x0D"}))
+		.on('open', this.openHandler.bind(this));
+		this.port.pipe(new serialPort.parsers.Delimiter(
+			{
+				delimiter: Buffer.from('\r', 'utf8'), 
+				encoding: 'utf8',
+				includeDelimiter: true
+			}
+		))
 		.on('data', this.dataHandler.bind(this));
 		this.port.open();
 	}

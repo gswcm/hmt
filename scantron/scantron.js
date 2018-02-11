@@ -1,4 +1,4 @@
-const Scanner = require("./components/scanner-v4");
+const Scanner = require("./components/scanner");
 const socketio = require("socket.io-client");
 
 let socket = socketio('https://hmt.gswcm.net/scantron');

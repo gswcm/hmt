@@ -2,9 +2,43 @@ const express = require("express");
 const errToJSON = require("error-to-json");
 const router = express.Router();
 const Account = require("../../lib/models/account");
-const Registration = require("../../lib/models/registration");
 const Counter = require("../../lib/models/counter");
+const Archive = require("../../lib/models/archive");
+const Registration = require("../../lib/models/registration");
 const evalCredentials = require("../../lib/utils").evalCredentials;
+const getRawRQS = require("../../lib/utils").getRawRQS;
+
+
+router.post("/mtn/archive", (req,res) => {
+	let credentials = req.body.credentials;
+	let year = req.body.credentials;
+	if(!/^\d{4}$/.test(year)) {
+		throw new Error('Year parameter has to be in 4-digits format');
+	}
+	evalCredentials(credentials)
+	.then(() => {
+		return getRawRQS();
+	})
+	.then(rqs => {
+		return Archive.findOneAndUpdate({year}, {
+			year,
+			r: rqs.r,
+			q: rqs.q,
+			s: rqs.s	
+		},
+		{
+			upsert: true
+		});
+	})
+	.then(() => {
+		return res.json({ 
+			status: 0,
+		});
+	})
+	.catch(error => {
+		res.json({ status: 500, error: errToJSON(error) });
+	});
+});
 
 
 router.post("/mtn/removeStale", (req,res) => {
@@ -53,11 +87,6 @@ router.post("/mtn/reseq", (req,res) => {
 		return Registration.find().sort({email:1}).exec();
 	})
 	.then(records => {
-		// return Promise.all(records.map(record => {
-		// 	console.log(record.email);
-		// 	record.seq = null;
-		// 	return record.save();
-		// }));
 		return records.reduce((promise,record) => promise.then(() => {
 			record.seq = null;
 			return record.save();
