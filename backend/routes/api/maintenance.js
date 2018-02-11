@@ -6,14 +6,17 @@ const Counter = require("../../lib/models/counter");
 const Archive = require("../../lib/models/archive");
 const Registration = require("../../lib/models/registration");
 const evalCredentials = require("../../lib/utils").evalCredentials;
-const getRawRQS = require("../../lib/utils").getRawRQS;
+const getRawRQS = require("../../lib/rqs").getRawRQS;
 
 
 router.post("/mtn/archive", (req,res) => {
 	let credentials = req.body.credentials;
-	let year = req.body.credentials;
+	let year = req.body.year;
 	if(!/^\d{4}$/.test(year)) {
-		throw new Error('Year parameter has to be in 4-digits format');
+		return res.json({ 
+			status: 400, 
+			error: errToJSON(new Error('Year parameter has to be in 4-digits format')) 
+		});
 	}
 	evalCredentials(credentials)
 	.then(() => {
@@ -30,8 +33,9 @@ router.post("/mtn/archive", (req,res) => {
 			upsert: true
 		});
 	})
-	.then(() => {
+	.then((rqs) => {
 		return res.json({ 
+			rqs,
 			status: 0,
 		});
 	})

@@ -14,7 +14,11 @@
 			</b-navbar-brand>
 			<b-collapse is-nav id="nav_collapse">
 				<b-navbar-nav class="ml-auto">
-					<b-nav-item href="/stats">Results</b-nav-item>
+					<b-nav-item-dropdown text="Results" right>
+						<b-dropdown-item href="/stat">This year</b-dropdown-item>
+						<b-dropdown-header v-if="years.length">Archived years(s)</b-dropdown-header>
+						<b-dropdown-item v-if="years.length" v-for="year in years" :key="year" :href="`/archive?year=${year}`">{{year}}</b-dropdown-item>
+					</b-nav-item-dropdown>
 					<b-nav-item href="/about">About</b-nav-item>
 				</b-navbar-nav>
 			</b-collapse>
@@ -29,12 +33,34 @@
 	import { mapGetters } from 'vuex';
 	export default {
 		data: () => ({
+			years: []
 		}),
 		computed: {
 			...mapGetters({
 				isAdmin: 'getIsAdmin',
 			})
 		},
+		created() {
+			//-- Retrieve list of archived years
+			this.axios
+			.post("/api/results/years")
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.years = response.data.archives.map(e => e.year);
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
+		}
 	}
 </script>
 

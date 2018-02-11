@@ -20,6 +20,13 @@
 			</ul>
 		</p>
 		<b-btn variant="outline-danger" @click="removeStaleData">Remove stale data</b-btn>
+		<hr>
+		<!-- Remove stale data -->
+		<h4>Archive tournament data (registrations, questions, scans)</h4>
+		<p>
+			The application can be rolled out for the next year tournament by archiving current year data so the results remain available.The archived version of tournament data doeasn't maintain service info like <i>temporal (unconfirmed) registrations</i>, <i>payment status</i>, etc. After archiving you will need to explicitely wipe current tournament data by using dedicated maintenance utility.
+		</p>
+		<b-btn variant="outline-danger" @click="doArchive">Archive all data</b-btn>
 	</div>
 </template>
 
@@ -43,6 +50,30 @@ export default {
 		}
 	},
 	methods: {
+		doArchive() {
+			this.axios
+			.post("/api/mtn/archive", {
+				credentials: this.runtime.credentials,
+				year: new Date().getFullYear().toString()
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.$noty.success(`Tournament data have been successfully archived`);
+					console.log(response.data.rqs);
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
+		},
 		removeStaleData() {
 			this.axios
 			.post("/api/mtn/removeStale", {
