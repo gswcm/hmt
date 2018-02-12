@@ -233,7 +233,7 @@ export default {
 			//-- Post the changes into VUEX store					
 			this.$store.commit(types.SET_TOURNAMENT, tournament);
 			if(this.isAdmin) {
-				console.log(tournament);
+				console.log(JSON.parse(JSON.stringify(tournament)));
 			}
 		},
 		refresh() {

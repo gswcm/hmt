@@ -76,6 +76,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { debounce } from 'lodash';
+import types from '../../store/mutations';
 import records from './records.vue';
 import questions from './questions.vue';
 import scantron from './scantron.vue';
@@ -160,6 +161,7 @@ export default {
 			}
 			if (this.credentialsReady) {
 				this.authenticated = false;
+				this.$store.commit(types.SET_IS_ADMIN, false);
 				this.axios.post("/api/admin/eval", this.credentials)
 				.then(response => {
 					if (response.data.status) {
@@ -169,6 +171,7 @@ export default {
 					} 
 					else {
 						this.authenticated = true;
+						this.$store.commit(types.SET_IS_ADMIN, true);
 					}
 				})
 				.catch(error => {
