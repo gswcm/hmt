@@ -1,6 +1,6 @@
 <template>
 	<b-container fluid>
-		<b-form @submit.prevent="credentialChecker" class="d-print-none">
+		<b-form v-show="!authenticated" @submit.prevent="credentialChecker" class="d-print-none">
 			<b-form-group :class="['login', 'my-3', 'p-3', 'bg-warning', 'rounded']">
 				<b-row>
 					<b-col cols="12" md>
@@ -37,30 +37,33 @@
 				We will send an e-mail with password recovery link to <strong>{{credentials.email}}</strong>. Please confirm your will or close this dialog to cancel recovery process.
 			</p>
 		</b-modal>
-		
-		<!-- <records :credentials="credentials" v-if="authenticated"/> -->
-		<b-tabs v-if="authenticated">
-			<!-- Registrations: view and print -->
-			<b-tab title="<span class='d-none d-sm-inline-block'>Records</span><span class='d-inline-block d-sm-none'>Recs</span>" active>
-				<records :credentials="credentials"/>
-			</b-tab>
-			<!-- Questions: edit -->
-			<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs</span>">
-				<questions :credentials="credentials"/>
-			</b-tab>
-			<!-- Scantron: integration with scantron -->
-			<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan</span>">
-				<scantron :credentials="credentials"/>
-			</b-tab>
-			<!-- Results -->
-			<b-tab title="<span class='d-none d-sm-inline-block'>Results</span><span class='d-inline-block d-sm-none'>Res</span>">
-				<results/>
-			</b-tab>
-			<!-- Maintenance -->
-			<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint</span>" title-item-class="ml-auto">
-				<maintenance :credentials="credentials"/>
-			</b-tab>
-		</b-tabs>
+		<div v-if="authenticated" class="mt-3">
+			<div class="d-flex justify-content-center" >
+				<h3 class="p-3">Admin interface</h3>
+			</div>
+			<b-tabs >
+				<!-- Registrations: view and print -->
+				<b-tab title="<span class='d-none d-sm-inline-block'>Records</span><span class='d-inline-block d-sm-none'>Recs</span>" active>
+					<records :credentials="credentials"/>
+				</b-tab>
+				<!-- Questions: edit -->
+				<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs</span>">
+					<questions :credentials="credentials"/>
+				</b-tab>
+				<!-- Scantron: integration with scantron -->
+				<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan</span>">
+					<scantron :credentials="credentials"/>
+				</b-tab>
+				<!-- Results -->
+				<b-tab title="<span class='d-none d-sm-inline-block'>Results</span><span class='d-inline-block d-sm-none'>Res</span>">
+					<results/>
+				</b-tab>
+				<!-- Maintenance -->
+				<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint</span>" title-item-class="ml-auto">
+					<maintenance :credentials="credentials"/>
+				</b-tab>
+			</b-tabs>
+		</div>
 
 		<b-alert v-else show variant="warning">
 			<p class="text-justified">

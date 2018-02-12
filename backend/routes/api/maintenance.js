@@ -2,12 +2,43 @@ const express = require("express");
 const errToJSON = require("error-to-json");
 const router = express.Router();
 const Account = require("../../lib/models/account");
+const Timeline = require("../../lib/models/timeline");
 const Counter = require("../../lib/models/counter");
 const Archive = require("../../lib/models/archive");
 const Registration = require("../../lib/models/registration");
 const evalCredentials = require("../../lib/utils").evalCredentials;
 const getRawRQS = require("../../lib/rqs").getRawRQS;
 
+
+router.post("/mtn/timeline", (req,res) => {
+	let credentials = req.body.credentials;
+	let deadlines = req.body.deadlines;
+	let ignore = req.body.ignore;
+	console.log(deadlines);
+	evalCredentials(credentials)
+	.then(() => {
+		return Timeline.findOne()
+		.then(timeline => {
+			if(!timeline) {
+				timeline = new Timeline();
+			}
+			if(!ignore) {
+				timeline.deadlines = deadlines;
+			}
+			return timeline.save();
+		});
+	})
+	.then(timeline => {
+		console.log(timeline);
+		return res.json({ 
+			timeline,
+			status: 0,
+		});
+	})
+	.catch(error => {
+		res.json({ status: 500, error: errToJSON(error) });
+	});
+});
 
 router.post("/mtn/archive", (req,res) => {
 	let credentials = req.body.credentials;

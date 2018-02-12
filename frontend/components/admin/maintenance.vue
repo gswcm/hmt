@@ -1,14 +1,14 @@
 <template>
 	<div class="mt-3 p-3">
-		<b-alert show dismissible variant="danger">
-			This interface is intended for direct manipulation of selected database fileds. Use with caution. 
+		<b-alert show variant="danger">
+			This interface is intended for direct manipulation of selected database tables. Use with caution. 
 		</b-alert>
 		<!-- Resequence registrations -->
 		<h4>Re-sequence registrations</h4>
 		<p>
 			All registration records are assigned with unique numbers that constitute part of the registration ID. Any given registration is associated with a 2-digits number. Re-sequencing process sorts all registrations by e-mail and assigns sequence numbers starting from "00".					
 		</p>
-		<b-btn variant="outline-danger" @click="reSequence">Re-sequence</b-btn>
+		<b-btn class="ml-auto d-block" variant="outline-danger" @click="reSequence">Re-sequence</b-btn>
 		<hr>
 		<!-- Remove stale data -->
 		<h4>Remove stale database entries</h4>
@@ -19,30 +19,97 @@
 				<li>Records from "registrations" with both <strong>main</strong> and <strong>temp</strong> attributes set to <strong>null</strong></li>	
 			</ul>
 		</p>
-		<b-btn variant="outline-danger" @click="removeStaleData">Remove stale data</b-btn>
+		<b-btn class="ml-auto d-block" variant="outline-danger" @click="removeStaleData">Remove stale data</b-btn>
 		<hr>
-		<!-- Remove stale data -->
+		<!-- Archive tournament data -->
 		<h4>Archive tournament data (registrations, questions, scans)</h4>
 		<p>
 			The application can be rolled out for the next year tournament by archiving current year data so the results remain available.The archived version of tournament data doeasn't maintain service info like <i>temporal (unconfirmed) registrations</i>, <i>payment status</i>, etc. After archiving you will need to explicitely wipe current tournament data by using dedicated maintenance utility.
 		</p>
-		<b-btn variant="outline-danger" @click="doArchive">Archive all data</b-btn>
+		<b-btn class="ml-auto d-block" variant="outline-danger" @click="doArchive">Archive all data</b-btn>
+		<hr>
+		<!-- Set tournament dates -->
+		<h4>Set important deadlines for the current year tournament</h4>
+		<p>
+			The tournament event is associated with <strong>4 dealines</strong>:
+			<ol>
+				<li><strong>Payments</strong> without late fee</li>
+				<li>Allowance to make <strong>new</strong> registrations</li>
+				<li>Allowance to <strong>update</strong> existing registrations</li>
+				<li><strong>Release</strong> of tournament results</li>
+			</ol>
+		</p>
+		<b-row align-v="end">
+			<b-col cols="12" sm="3" class="mt-3 mt-sm-0"> 
+				<strong class="ml-2">Payment</strong>
+				<datepicker 
+					:disabled="datepickingDisabled"
+					:class="['border', 'rounded', 'mt-1', 'p-2', 'datepicker', deadlines.payment ? 'border-dark' : 'border-danger']" 
+					placeholder="Select date" 
+					v-model="deadlines.payment"/>
+			</b-col>
+			<b-col cols="12" sm="3" class="mt-3 mt-sm-0"> 
+				<strong class="ml-2">New registrations</strong>
+				<datepicker 
+					:disabled="datepickingDisabled"
+					:class="['border', 'rounded', 'mt-1', 'p-2', 'datepicker', deadlines.makeNew ? 'border-dark' : 'border-danger']" 
+					placeholder="Select date" 
+					v-model="deadlines.makeNew"/>
+			</b-col>
+			<b-col cols="12" sm="3" class="mt-3 mt-sm-0"> 
+				<strong class="ml-2">Update registrations</strong>
+				<datepicker 
+					:disabled="datepickingDisabled"
+					:class="['border', 'rounded', 'mt-1', 'p-2', 'datepicker', deadlines.updateExisting ? 'border-dark' : 'border-danger']" 
+					placeholder="Select date" 
+					v-model="deadlines.updateExisting"/>
+			</b-col>
+			<b-col cols="12" sm="3" class="mt-3 mt-sm-0"> 
+				<strong class="ml-2">Release results</strong>
+				<datepicker 
+					:disabled="datepickingDisabled"
+					:class="['border', 'rounded', 'mt-1', 'p-2', 'datepicker', deadlines.releaseResults ? 'border-dark' : 'border-danger']" 
+					placeholder="Select date" 
+					v-model="deadlines.releaseResults"/>
+			</b-col>
+		</b-row>
+		<b-btn :disabled="!disableDeadlineUpdate" class="ml-auto d-block mt-5" variant="outline-danger" @click="doDeadlines(true)">Update deadlines</b-btn>
+		<!-- Spacer -->
+		<div class="py-5 mt-5"></div>
 	</div>
 </template>
 
 <script>
-// import axios from 'axios';
+import Datepicker from 'vuejs-datepicker'
 export default {
 	props: {
 		credentials: Object
 	},
+	components: {
+		Datepicker
+	},
 	data: () => ({
 		runtime: {
 			credentials: {}
+		},
+		deadlines: {
+			makeNew: null,
+			updateExisting: null,
+			payment: null,
+			releaseResults: null
+		},
+		datepickingDisabled: {
+			to: new Date()
 		}
 	}),
+	computed: {
+		disableDeadlineUpdate() {
+			return Object.keys(this.deadlines).reduce((a,i) => a && (this.deadlines[i] !== null), true);
+		}
+	},
 	created() {
 		this.runtime.credentials = this.credentials;
+		this.doDeadlines();
 	},
 	watch: {
 		credentials() {
@@ -50,6 +117,36 @@ export default {
 		}
 	},
 	methods: {
+		doDeadlines(clicked = false) {
+			this.axios
+			.post("/api/mtn/timeline", {
+				credentials: this.runtime.credentials,
+				deadlines: this.deadlines,
+				ignore: !clicked
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					console.log(response.data.timeline);
+					if(response.data.timeline && response.data.timeline.deadlines) {
+						this.deadlines = response.data.timeline.deadlines;
+					}
+					if(clicked) {
+						this.$noty.success(`Deadlines have been updated`);
+					}
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
+		},
 		doArchive() {
 			this.axios
 			.post("/api/mtn/archive", {
@@ -64,7 +161,6 @@ export default {
 				} 
 				else {
 					this.$noty.success(`Tournament data have been successfully archived`);
-					console.log(response.data.rqs);
 				}
 			})
 			.catch(error => {
@@ -122,3 +218,9 @@ export default {
 	}
 };
 </script>
+<style>
+	.datepicker input {
+		border: none;
+	}
+</style>
+

@@ -6,10 +6,10 @@
 				<span class="d-none d-md-inline-block">
 					The Jay Cliett and Bill Kipp 
 					<br class="my-0 d-inline-block d-lg-none"/>
-					<small>GSW School Mathematics Tournament 2018 @ GSW</small>
+					<small>GSW School Mathematics Tournament @ GSW</small>
 				</span>
 				<span class="d-inline-block d-md-none">
-					Cliett and Kipp <br class="d-sm-none"/>GSW Math Tournament 2018
+					Cliett and Kipp <br class="d-sm-none"/>GSW Math Tournament
 				</span>
 			</b-navbar-brand>
 			<b-collapse is-nav id="nav_collapse">

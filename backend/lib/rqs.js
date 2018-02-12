@@ -33,7 +33,6 @@ module.exports = {
 			if(!rqs) {
 				return Promise.reject(new Error(`Archive for ${year} year not found`));
 			}
-			console.log(rqs);
 			let r = {};
 			for(let i of rqs.r) {
 				r[i.seq] = { ..._.pick(i.main,['team','school','sponsor']), seq:i.seq, email:i.email };
