@@ -31,6 +31,7 @@
 
 <script>
 	import { mapGetters } from 'vuex';
+	import types from '../store/mutations';
 	export default {
 		data: () => ({
 			years: []
@@ -38,28 +39,59 @@
 		computed: {
 			...mapGetters({
 				isAdmin: 'getIsAdmin',
+				deadlines: 'getDeadlines'
 			})
 		},
 		created() {
-			//-- Retrieve list of archived years
-			this.axios
-			.post("/api/results/years")
-			.then(response => {
-				if (response.data.status) {
-					//-- server error
-					let error = response.data.error || new Error("not sure");
-					throw error;
-				} 
-				else {
-					this.years = response.data.archives.map(e => e.year);
-				}
-			})
-			.catch(error => {
-				this.$noty.error(
-					`Something went wrong... more specifically: ${error.message}`
-				);
-				console.error(error.stack);
-			});
+			this.getYears()
+			this.getDeadlines();
+		},
+		methods: {
+			getYears() {
+				//-- Retrieve list of archived years
+				this.axios
+				.post("/api/results/years")
+				.then(response => {
+					if (response.data.status) {
+						//-- server error
+						let error = response.data.error || new Error("not sure");
+						throw error;
+					} 
+					else {
+						this.years = response.data.archives.map(e => e.year);
+					}
+				})
+				.catch(error => {
+					this.$noty.error(
+						`Something went wrong... more specifically: ${error.message}`
+					);
+					console.error(error.stack);
+				});
+			},
+			getDeadlines() {
+				this.axios
+				.post("/api/mtn/timeline", {
+					update: false
+				})
+				.then(response => {
+					if (response.data.status) {
+						//-- server error
+						let error = response.data.error || new Error("not sure");
+						throw error;
+					} 
+					else {
+						if(response.data.timeline && response.data.timeline.deadlines) {
+							this.$store.commit(types.SET_DEADLINES, response.data.timeline.deadlines);
+						}
+					}
+				})
+				.catch(error => {
+					this.$noty.error(
+						`Something went wrong... more specifically: ${error.message}`
+					);
+					console.error(error.stack);
+				});
+			},
 		}
 	}
 </script>
@@ -67,6 +99,15 @@
 <style>
 	.root {
 		min-width: 420px;
+	}
+	a.dropdown-item:focus {
+		outline: 0;
+		box-shadow: none;
+	}
+	a.dropdown-item:hover {
+		font-weight: bold;
+		background-color: rgb(33,37,41);
+		color: white;
 	}
 	@media print {
 		@page {			

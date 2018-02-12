@@ -5,12 +5,14 @@ import types from './mutations';
 const state = {
 	isAdmin: false,
 	email: '',
-	tournament: null
+	tournament: null,
+	deadlines: null
 };
 const getters = {
 	getIsAdmin: (state) => state.isAdmin,
 	getEmail: (state) => state.email,
 	getTournament: (state) => state.tournament,
+	getDeadlines: (state) => state.deadlines,
 };
 const actions = {
 };
@@ -23,6 +25,9 @@ const mutations = {
 	},
 	[types.SET_TOURNAMENT]: (state, tournament) => {
 		state.tournament = tournament;
+	},
+	[types.SET_DEADLINES]: (state, deadlines) => {
+		state.deadlines = deadlines;
 	},
 };
 

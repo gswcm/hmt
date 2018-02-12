@@ -13,23 +13,21 @@ const getRawRQS = require("../../lib/rqs").getRawRQS;
 router.post("/mtn/timeline", (req,res) => {
 	let credentials = req.body.credentials;
 	let deadlines = req.body.deadlines;
-	let ignore = req.body.ignore;
-	console.log(deadlines);
-	evalCredentials(credentials)
+	let update = req.body.update;
+	update ? evalCredentials(credentials) : Promise.resolve()
 	.then(() => {
 		return Timeline.findOne()
 		.then(timeline => {
 			if(!timeline) {
 				timeline = new Timeline();
 			}
-			if(!ignore) {
+			if(update) {
 				timeline.deadlines = deadlines;
 			}
 			return timeline.save();
 		});
 	})
 	.then(timeline => {
-		console.log(timeline);
 		return res.json({ 
 			timeline,
 			status: 0,

@@ -39,6 +39,9 @@
 				<li><strong>Release</strong> of tournament results</li>
 			</ol>
 		</p>
+		<b-alert class="p-3" show variant="warning">
+			Make sure that all <strong>deadlines are ordered</strong>, e.g. "payment" must happen before "new registration cut-off". Otherwise <strong>update button</strong> will be disabled.
+		</b-alert>
 		<b-row align-v="end">
 			<b-col cols="12" sm="3" class="mt-3 mt-sm-0"> 
 				<strong class="ml-2">Payment</strong>
@@ -99,12 +102,20 @@ export default {
 			releaseResults: null
 		},
 		datepickingDisabled: {
-			to: new Date()
+			//-- Dates can be set up to 5 days before today's date
+			to: (() => {
+				let d = new Date();
+				d.setDate(d.getDate()-5);
+				return d;
+			})()
 		}
 	}),
 	computed: {
 		disableDeadlineUpdate() {
-			return Object.keys(this.deadlines).reduce((a,i) => a && (this.deadlines[i] !== null), true);
+			const order = ['payment', 'makeNew', 'updateExisting', 'releaseResults'];
+			let result = (this.deadlines[order[0]] !== null) && 
+				order.slice(1).reduce((a,e,i) => a && (this.deadlines[e] !== null) && (new Date(this.deadlines[order[i+1]]) >= new Date(this.deadlines[order[i]])), true);
+			return result;
 		}
 	},
 	created() {
@@ -117,12 +128,12 @@ export default {
 		}
 	},
 	methods: {
-		doDeadlines(clicked = false) {
+		doDeadlines(update = false) {
 			this.axios
 			.post("/api/mtn/timeline", {
 				credentials: this.runtime.credentials,
 				deadlines: this.deadlines,
-				ignore: !clicked
+				update
 			})
 			.then(response => {
 				if (response.data.status) {
@@ -131,11 +142,10 @@ export default {
 					throw error;
 				} 
 				else {
-					console.log(response.data.timeline);
 					if(response.data.timeline && response.data.timeline.deadlines) {
 						this.deadlines = response.data.timeline.deadlines;
 					}
-					if(clicked) {
+					if(update) {
 						this.$noty.success(`Deadlines have been updated`);
 					}
 				}
