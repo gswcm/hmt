@@ -158,6 +158,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { debounce, escapeRegExp, pick } from "lodash";
 import registration from "../form/registration.vue";
 import jsPDF from "jspdf";
@@ -166,18 +167,7 @@ export default {
 	components: {
 		registration,
 	},
-	props: {
-		credentials: Object
-	},
-	watch: {
-		credentials() {
-			this.runtime.credentials = this.credentials;
-		}
-	},
 	data: () => ({
-		runtime: {
-			credentials: {}
-		},
 		registration: {
 			value: {},
 			status: null
@@ -195,10 +185,12 @@ export default {
 		email: "",
 	}),
 	created() {
-		this.runtime.credentials = this.credentials;
 		this.refresh();
 	},
 	computed: {	
+		...mapGetters({
+			credentials: 'getCredentials',
+		}),
 		paid() {
 			let record = this.records.find(i => i.email === this.email);
 			return record ? record.paid : false;
@@ -296,7 +288,7 @@ export default {
 			.post("/api/admin/update", {
 				email: this.email,
 				registration: this.registration.value,
-				credentials: this.runtime.credentials
+				credentials: this.credentials
 			})
 			.then(response => {
 				if (response.data.status) {
@@ -324,7 +316,7 @@ export default {
 			this.axios
 			.post("/api/admin/confirm", {
 				email: this.email,
-				credentials: this.runtime.credentials
+				credentials: this.credentials
 			})
 			.then(response => {
 				if (response.data.status) {
@@ -351,7 +343,7 @@ export default {
 			this.axios
 				.post("/api/admin/remove", {
 					email: this.email,
-					credentials: this.runtime.credentials
+					credentials: this.credentials
 				})
 				.then(response => {
 					if (response.data.status) {
@@ -378,7 +370,7 @@ export default {
 			this.axios
 				.post("/api/admin/paid", {
 					email: this.email,
-					credentials: this.runtime.credentials,
+					credentials: this.credentials,
 					paid: value
 				})
 				.then(response => {

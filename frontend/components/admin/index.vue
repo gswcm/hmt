@@ -48,7 +48,7 @@
 				</b-tab>
 				<!-- Questions: edit -->
 				<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs</span>">
-					<questions :credentials="credentials"/>
+					<questions/>
 				</b-tab>
 				<!-- Scantron: integration with scantron -->
 				<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan</span>">
@@ -60,7 +60,7 @@
 				</b-tab>
 				<!-- Maintenance -->
 				<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint</span>" title-item-class="ml-auto">
-					<maintenance :credentials="credentials"/>
+					<maintenance/>
 				</b-tab>
 			</b-tabs>
 		</div>
@@ -80,7 +80,7 @@ import types from '../../store/mutations';
 import records from './records.vue';
 import questions from './questions.vue';
 import scantron from './scantron.vue';
-import maintenance from './maintenance.vue';
+import maintenance from '../maintenance/index.vue';
 import results from '../results/index.vue';
 export default {
 	data: () => ({
@@ -160,6 +160,7 @@ export default {
 				this.credentials[source] = value;
 			}
 			if (this.credentialsReady) {
+				this.$store.commit(types.SET_CREDENTIALS, this.credentials);
 				this.authenticated = false;
 				this.$store.commit(types.SET_IS_ADMIN, false);
 				this.axios.post("/api/admin/eval", this.credentials)

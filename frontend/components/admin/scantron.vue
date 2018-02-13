@@ -2,7 +2,7 @@
 	<div class="p-4">
 		<b-row>
 			<b-col cols="12" class="" >
-				<b-textarea ref="textarea" :value="evalString" @input="evalUpdated" :rows="5" :max-rows="15" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron data will show up here..."/>
+				<b-textarea ref="textarea" :value="evalString" @input="evalUpdated" :rows="10" :max-rows="10" wrap="off" class="bg-light" :no-resize="true" placeholder="Scantron data will show up here..."/>
 			</b-col>
 		</b-row>
 		<div class="mt-3 px-3 row">
@@ -71,6 +71,7 @@
 
 <script>
 import { debounce } from 'lodash';
+import { mapGetters } from 'vuex';
 export default {
 	sockets: {
 		addScanData(data) {
@@ -85,21 +86,15 @@ export default {
 			}
 		}
 	},
-	props: {
-		credentials: Object
-	},
 	data: () => ({
-		runtime: {
-			credentials: {}
-		},
 		evalData: [],
 		force: false,
 		timer: null
 	}),
-	created() {
-		this.runtime.credentials = this.credentials;
-	},
 	computed: {
+		...mapGetters({
+			credentials: 'getCredentials',
+		}),
 		evalString() {
 			return this.timer ? this.evalStringBackup : this.a2s(this.evalData, true);
 		},
@@ -115,11 +110,6 @@ export default {
 					return false;
 				}
 			})
-		}
-	},
-	watch: {
-		credentials() {
-			this.runtime.credentials = this.credentials;
 		}
 	},
 	methods: {
@@ -168,7 +158,7 @@ export default {
 		evalLoad() {
 			this.axios
 			.post("/api/scan/get", {
-				credentials: this.runtime.credentials,
+				credentials: this.credentials,
 			})
 			.then(response => {
 				if (response.data.status) {
@@ -190,7 +180,7 @@ export default {
 		evalProcess(force = false) {
 			this.axios
 			.post("/api/scan/set", {
-				credentials: this.runtime.credentials,
+				credentials: this.credentials,
 				evalData: this.evalDataFiltered,
 				force
 			})
@@ -221,7 +211,7 @@ export default {
 		confirmClearRemote() {
 			this.axios
 			.post("/api/scan/set", {
-				credentials: this.runtime.credentials
+				credentials: this.credentials
 			})
 			.then(response => {
 				if (response.data.status) {

@@ -12,9 +12,9 @@ const getRawRQS = require("../../lib/rqs").getRawRQS;
 
 router.post("/mtn/timeline", (req,res) => {
 	let credentials = req.body.credentials;
-	let deadlines = req.body.deadlines;
+	let eventDate = req.body.eventDate;
 	let update = req.body.update;
-	update ? evalCredentials(credentials) : Promise.resolve()
+	(update ? evalCredentials(credentials) : Promise.resolve())
 	.then(() => {
 		return Timeline.findOne()
 		.then(timeline => {
@@ -22,7 +22,7 @@ router.post("/mtn/timeline", (req,res) => {
 				timeline = new Timeline();
 			}
 			if(update) {
-				timeline.deadlines = deadlines;
+				timeline.eventDate = eventDate;
 			}
 			return timeline.save();
 		});

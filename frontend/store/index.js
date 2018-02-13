@@ -6,13 +6,17 @@ const state = {
 	isAdmin: false,
 	email: '',
 	tournament: null,
-	deadlines: null
+	eventDate: null,
+	years: [],
+	credentials: null
 };
 const getters = {
 	getIsAdmin: (state) => state.isAdmin,
 	getEmail: (state) => state.email,
 	getTournament: (state) => state.tournament,
-	getDeadlines: (state) => state.deadlines,
+	getEventDate: (state) => state.eventDate,
+	getYears: (state) => state.years,
+	getCredentials: (state) => state.credentials
 };
 const actions = {
 };
@@ -26,8 +30,14 @@ const mutations = {
 	[types.SET_TOURNAMENT]: (state, tournament) => {
 		state.tournament = tournament;
 	},
-	[types.SET_DEADLINES]: (state, deadlines) => {
-		state.deadlines = deadlines;
+	[types.SET_EVENT_DATE]: (state, eventDate) => {
+		state.eventDate = eventDate;
+	},
+	[types.SET_YEARS]: (state, years) => {
+		state.years = years;
+	},
+	[types.SET_CREDENTIALS]: (state, credentials) => {
+		state.credentials = credentials;
 	},
 };
 

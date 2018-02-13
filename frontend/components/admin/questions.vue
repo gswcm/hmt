@@ -38,21 +38,20 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { pick } from "lodash";
 import { Q } from "../../../configs/params";
 export default {
-	props: {
-		credentials: Object
-	},
 	data: () => ({
-		runtime: {
-			credentials: {}
-		},
 		Q: [],
 		options: []
 	}),
+	computed: {
+		...mapGetters({
+			credentials: 'getCredentials',
+		}),
+	},
 	created() {
-		this.runtime.credentials = this.credentials;
 		this.options = [
 			{ value: null, text: "--"},
 			...Object.keys(Q).map(i => ({
@@ -62,16 +61,11 @@ export default {
 		];
 		this.getQuestions();
 	},
-	watch: {
-		credentials() {
-			this.runtime.credentials = this.credentials;
-		}
-	},
 	methods: {
 		getQuestions() {
 			this.axios
 			.post("/api/Q", {
-				credentials: this.runtime.credentials
+				credentials: this.credentials
 			})
 			.then(response => {
 				if (response.data.status) {
@@ -94,7 +88,7 @@ export default {
 			this.axios
 			.post("/api/Q", {
 				questions: this.Q,
-				credentials: this.runtime.credentials
+				credentials: this.credentials
 			})
 			.then(response => {
 				if (response.data.status) {

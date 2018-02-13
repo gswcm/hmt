@@ -33,18 +33,18 @@
 	import { mapGetters } from 'vuex';
 	import types from '../store/mutations';
 	export default {
-		data: () => ({
-			years: []
+		data: () => ({			
 		}),
 		computed: {
 			...mapGetters({
 				isAdmin: 'getIsAdmin',
-				deadlines: 'getDeadlines'
+				deadlines: 'getDeadlines',
+				years: 'getYears'
 			})
 		},
 		created() {
 			this.getYears()
-			this.getDeadlines();
+			// this.getDeadlines();
 		},
 		methods: {
 			getYears() {
@@ -57,8 +57,8 @@
 						let error = response.data.error || new Error("not sure");
 						throw error;
 					} 
-					else {
-						this.years = response.data.archives.map(e => e.year);
+					else if(Array.isArray(response.data.archives) && response.data.archives.length){
+						this.$store.commit(types.SET_YEARS, response.data.archives.map(e => e.year));
 					}
 				})
 				.catch(error => {
