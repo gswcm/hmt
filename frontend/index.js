@@ -30,7 +30,7 @@ import {
    faWrench,
 	faList,
 	faFilter,
-    faPrint
+   faPrint
 } from '@fortawesome/fontawesome-free-solid';
 import bootstrapVue from 'bootstrap-vue';
 import store from './store';

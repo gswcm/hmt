@@ -14,8 +14,8 @@
 			</b-navbar-brand>
 			<b-collapse is-nav id="nav_collapse">
 				<b-navbar-nav class="ml-auto">
-					<b-nav-item-dropdown text="Results" right>
-						<b-dropdown-item href="/stat">This year</b-dropdown-item>
+					<b-nav-item-dropdown :disabled="!years.length && !releaseResults" text="Results" right>
+						<b-dropdown-item v-if="releaseResults" href="/stat">This year</b-dropdown-item>
 						<b-dropdown-header v-if="years.length">Archived years(s)</b-dropdown-header>
 						<b-dropdown-item v-if="years.length" v-for="year in years" :key="year" :href="`/archive?year=${year}`">{{year}}</b-dropdown-item>
 					</b-nav-item-dropdown>
@@ -32,19 +32,23 @@
 <script>
 	import { mapGetters } from 'vuex';
 	import types from '../store/mutations';
+	import moment from 'moment';
 	export default {
 		data: () => ({			
 		}),
 		computed: {
 			...mapGetters({
 				isAdmin: 'getIsAdmin',
-				deadlines: 'getDeadlines',
+				eventDate: 'getEventDate',
 				years: 'getYears'
-			})
+			}),
+			releaseResults() {
+				return moment().isAfter(moment(this.eventDate).startOf('day').add(1,'day'));
+			}
 		},
 		created() {
 			this.getYears()
-			// this.getDeadlines();
+			this.getEventDate();
 		},
 		methods: {
 			getYears() {
@@ -68,7 +72,7 @@
 					console.error(error.stack);
 				});
 			},
-			getDeadlines() {
+			getEventDate() {
 				this.axios
 				.post("/api/mtn/timeline", {
 					update: false
@@ -80,8 +84,8 @@
 						throw error;
 					} 
 					else {
-						if(response.data.timeline && response.data.timeline.deadlines) {
-							this.$store.commit(types.SET_DEADLINES, response.data.timeline.deadlines);
+						if(response.data.timeline && response.data.timeline.eventDate) {
+							this.$store.commit(types.SET_EVENT_DATE, response.data.timeline.eventDate);
 						}
 					}
 				})
