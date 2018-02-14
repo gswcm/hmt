@@ -9,6 +9,9 @@
 		<!-- Remove stale data -->
 		<remove-stale/>
 		<hr>
+		<!-- Remove this year data (registrations, questions, scans) -->
+		<remove-this-year/>
+		<hr>
 		<!-- Archive tournament data -->
 		<do-archive/>
 		<hr>
@@ -22,11 +25,12 @@
 <script>
 import reSequence from './reSequence.vue';
 import removeStale from './removeStale.vue';
+import removeThisYear from './removeThisYear.vue';
 import doArchive from './doArchive.vue';
 import timeline from './timeline.vue';
 export default {
 	components: {
-		reSequence, removeStale, doArchive, timeline
+		reSequence, removeStale, removeThisYear, doArchive, timeline
 	}
 };
 </script>

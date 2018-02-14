@@ -3,6 +3,8 @@ const errToJSON = require("error-to-json");
 const router = express.Router();
 const Account = require("../../lib/models/account");
 const Timeline = require("../../lib/models/timeline");
+const Q = require("../../lib/models/q");
+const Scan = require("../../lib/models/scan");
 const Counter = require("../../lib/models/counter");
 const Archive = require("../../lib/models/archive");
 const Registration = require("../../lib/models/registration");
@@ -73,6 +75,33 @@ router.post("/mtn/archive", (req,res) => {
 	});
 });
 
+router.post("/mtn/removeThisYear", (req,res) => {
+	let credentials = req.body.credentials;
+	evalCredentials(credentials)
+	.then(() => {
+		return Account.deleteMany({admin:false});
+	})
+	.then(() => {
+		return Registration.deleteMany();
+	})
+	.then(() => {
+		return Q.deleteMany();
+	})
+	.then(() => {
+		return Scan.deleteMany();
+	})
+	.then(() => {
+		return Counter.deleteMany();
+	})
+	.then(() => {
+		res.json({
+			status: 0
+		});
+	})
+	.catch(error => {
+		res.json({ status: 500, error: errToJSON(error) });
+	});
+});
 
 router.post("/mtn/removeStale", (req,res) => {
 	let credentials = req.body.credentials;
