@@ -2,7 +2,13 @@
 	<div>
 		<h4>Day of the event</h4>
 		<p>
-			Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ad ipsum ratione iusto deserunt quo accusamus vel delectus molestias sed sapiente dolore consectetur, consequatur voluptatem deleniti in suscipit distinctio officiis aliquid!
+			Here you can specify when the tournament will take place next time. Based on that date the 4 more dates are calculated on fly:
+			<ol>
+				<li>Payment deadline (1 month before)</li>
+				<li>Deadline for create/update registrations (1 day before)</li>
+				<li>Day when results of the tournament will be posted (1 day after)</li>
+				<li>Tournament cycle closed and ready to be rolled over (6 months after)</li>
+			</ol>
 		</p>
 		<b-row align-v="center" class="my-2">
 			<b-col cols="12">
@@ -30,7 +36,7 @@ export default {
 			//-- Dates can be set up to 5 days before today's date
 			to: (() => {
 				let d = new Date();
-				d.setDate(d.getDate()-5);
+				d.setDate(d.getDate()-365);
 				return d;
 			})()
 		}

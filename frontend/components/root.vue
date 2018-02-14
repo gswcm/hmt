@@ -14,8 +14,8 @@
 			</b-navbar-brand>
 			<b-collapse is-nav id="nav_collapse">
 				<b-navbar-nav class="ml-auto">
-					<b-nav-item-dropdown :disabled="!years.length && !releaseResults" text="Results" right>
-						<b-dropdown-item v-if="releaseResults" href="/stat">This year</b-dropdown-item>
+					<b-nav-item-dropdown v-if="years.length || !isBefore.results" text="Results" right>
+						<b-dropdown-item v-if="!isBefore.results && isBefore.close" href="/stat">This year</b-dropdown-item>
 						<b-dropdown-header v-if="years.length">Archived years(s)</b-dropdown-header>
 						<b-dropdown-item v-if="years.length" v-for="year in years" :key="year" :href="`/archive?year=${year}`">{{year}}</b-dropdown-item>
 					</b-nav-item-dropdown>
@@ -42,8 +42,20 @@
 				eventDate: 'getEventDate',
 				years: 'getYears'
 			}),
-			releaseResults() {
-				return moment().isAfter(moment(this.eventDate).startOf('day').add(1,'day'));
+			dates() {
+				let event = moment(this.eventDate).startOf('day');
+				let results = moment(event).add(1,'days');
+				let close = moment(event).add(6,'months');
+				return {
+					event, results, close
+				};
+			},
+			isBefore() {
+				let results = moment().isBefore(this.dates.results);
+				let close = moment().isBefore(this.dates.close);
+				return { 
+					results, close 
+				};
 			}
 		},
 		created() {
@@ -62,7 +74,7 @@
 						throw error;
 					} 
 					else if(Array.isArray(response.data.archives) && response.data.archives.length){
-						this.$store.commit(types.SET_YEARS, response.data.archives.map(e => e.year));
+						this.$store.commit(types.SET_YEARS, response.data.archives.map(e => e.year).sort());
 					}
 				})
 				.catch(error => {
@@ -120,8 +132,6 @@
 		}
 		@page :first {			
 			margin-top: 0mm;
-		}
-		.root {
 		}
 		.card-header,
 		.nav-tabs {

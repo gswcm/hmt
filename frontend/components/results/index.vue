@@ -22,6 +22,7 @@
 import { pick } from "lodash";
 import { sprintf } from "sprintf-js";
 import { mapGetters } from 'vuex';
+import moment from 'moment';
 import * as params from "../../../configs/params"
 import tournament from "./tournament.vue";
 import divisions from "./divisions.vue";
@@ -40,13 +41,38 @@ export default {
 	created() {
 		this.refresh();
 	},
+	beforeRouteEnter(to, from, next) {
+		next(vm => {
+			// if(!vm.isAdmin) {
+				if(!vm.$route.query.year && (vm.isBefore.results || !vm.isBefore.close)) {
+					vm.$router.replace('/');
+				}
+			// }
+		});
+	},
 	watch: {
 	},
 	computed: {
 		...mapGetters({
 			isAdmin: 'getIsAdmin',
-			tournament: 'getTournament'
+			tournament: 'getTournament',
+			eventDate: 'getEventDate',
 		}),
+		dates() {
+			let event = moment(this.eventDate).startOf('day');
+			let results = moment(event).add(1,'days');
+			let close = moment(event).add(6,'months');
+			return {
+				event, results, close
+			};
+		},
+		isBefore() {
+			let results = moment().isBefore(this.dates.results);
+			let close = moment().isBefore(this.dates.close);
+			return { 
+				results, close 
+			};
+		}
 	},
 	methods: {
 		process({R,Q,S}) {
