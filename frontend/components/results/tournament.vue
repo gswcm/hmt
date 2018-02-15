@@ -3,13 +3,13 @@
 		<h5>
 			Participants
 		</h5>
-		<p class="pl-3">
-			There have been <strong> {{t.stats.scores.values.length}} participants</strong> who submitted their Scantron sheets for processing.  <span v-show="t.stats.scores.values.length">Their <strong>average score</strong> was <strong>{{t.stats.scores.avg.toFixed(2)}}</strong> out of possible 200. <strong>Standard deviation</strong> was <strong>{{t.stats.scores.std.toFixed(2)}}</strong></span>
+		<p class="pl-3 text-justify">
+			There have been <strong> {{t.stats.scores.values.length}} participants</strong> submitted Scantron sheets for processing.  <span v-show="t.stats.scores.values.length">Their <strong>average score</strong> was <strong>{{t.stats.scores.avg.toFixed(2)}}</strong> out of possible 200. <strong>Standard deviation</strong> was <strong>{{t.stats.scores.std.toFixed(2)}}</strong></span>
 		</p>
 		<h5 class="mt-5">
 			Per-question statistics
 		</h5>
-		<p class="pl-3">
+		<p class="pl-3 text-justify">
 			The following table summarizes the number of answers of particular kind to each question, <span class="badge badge-info">marks</span> correct answer, and shows the percentage of the number of correct answers to each question.
 		</p>
 		<b-table 

@@ -48,11 +48,11 @@
 				<strong>Note</strong>: The team registration cost is calculated based on the number of participants and payment date:
 				<ul>
 					<li>
-						If paid <strong>before December 30<span class="superscript">th</span>, 2017</strong>.
+						If paid <strong>before {{dates.payment.format('LL')}}</strong>.
 						The cost is <strong>$75</strong> for the first 8 members and <strong>$5</strong> for each extra participants
 					</li>
 					<li>
-						If paid <strong>after December 30<span class="superscript">th</span>, 2017</strong>.
+						If paid <strong>after {{dates.payment.format('LL')}}</strong>.
 						The cost is <strong>$100</strong> for the first 8 members and <strong>$5</strong> for each extra participants
 					</li>
 				</ul>
@@ -142,6 +142,8 @@
 </template>
 
 <script>
+	import moment from 'moment';
+	import { mapGetters } from 'vuex';
 	const { cloneDeep } = require('lodash');
 	export default {
 		props: {			
@@ -159,6 +161,16 @@
 			status: false,
 		}),
 		computed: {
+			...mapGetters({
+				eventDate: 'getEventDate',
+			}),
+			dates() {
+				let event = moment(this.eventDate).startOf('day');
+				let payment = moment(event).subtract(1,'months');
+				return {
+					event, payment
+				};
+			},
 			showTShirts() {
 				return !this.ro || (this.ro && this.runtime.value.tshirts.length > 0)
 			},

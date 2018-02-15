@@ -88,6 +88,14 @@ router.post("/mtn/removeThisYear", (req,res) => {
 		return Q.deleteMany();
 	})
 	.then(() => {
+		let q = new Q();
+		q.questions = Array.apply(null, Array(40)).map(() => ({
+			cat: null,
+			key: null
+		}));
+		return q.save();
+	})
+	.then(() => {
 		return Scan.deleteMany();
 	})
 	.then(() => {

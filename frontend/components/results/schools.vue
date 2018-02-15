@@ -18,33 +18,33 @@
 				</b-row>
 			</b-col>
 			<b-col cols="12" sm="" class="mt-3 mt-sm-0">
-				<b-row>
+				<b-row align-v="end">
 					<!-- School -->
 					<b-col cols="12">
 						<label><strong>School</strong></label>
 					</b-col>
-					<b-col>
+					<b-col cols="">
 						<b-select v-model="school" :options="schools"/>
 					</b-col>
+					<b-col cols="auto pl-0">
+						<b-btn 
+							variant="outline-dark" 
+							:disabled="!school"
+							@click="printOne">
+							<font-awesome-icon :icon="['fas', 'print']"/>
+						</b-btn>
+					</b-col>
+					<b-col cols="auto pl-0">
+						<b-btn 
+							variant="outline-dark" 
+							class=""
+							:disabled="!Object.keys(t.divisions).length"
+							@click="printAll">
+							<font-awesome-icon :icon="['fas', 'print']"/>
+							All
+						</b-btn>
+					</b-col>
 				</b-row>
-			</b-col>
-			<b-col cols="auto pl-0">
-				<b-btn 
-					variant="outline-dark" 
-					:disabled="!school"
-					@click="printOne">
-					<font-awesome-icon :icon="['fas', 'print']"/>
-				</b-btn>
-			</b-col>
-			<b-col cols="auto pl-0">
-				<b-btn 
-					variant="outline-dark" 
-					class=""
-					:disabled="!Object.keys(t.divisions).length"
-					@click="printAll">
-					<font-awesome-icon :icon="['fas', 'print']"/>
-					All
-				</b-btn>
 			</b-col>
 		</b-row>
 		<!-- Bulk print -->
