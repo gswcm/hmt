@@ -49,7 +49,7 @@
 			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Match total</h5>
 				<div variant="light" class="panel d-flex justify-content-center align-items-center">
-					<span class="banner">{{total}}</span>
+					<span v-if="isAdmin" class="banner">{{total}}</span>
 				</div>
 			</b-col>
 		</b-row>
@@ -173,7 +173,8 @@
 		border: 1px solid black;
 		border-radius: 10px;
 	}
-	.banner-input {
+	.banner-input,
+	.banner-input:focus {
 		border: none;
 		font-size: xx-large;
 		font-weight: bold;
