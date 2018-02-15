@@ -5,9 +5,9 @@
 			<h4 @click="refresh"> Tournament results are categorized and displayed below</h4>
 		</div>
 		<b-tabs v-if="tournament" pills card class="mt-3">
-			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T</span>"><tournament/></b-tab>
-			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D</span>"><divisions/></b-tab>
-			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S</span>"><schools class=""/></b-tab>
+			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T<span class='shorten'>ournament</span></span>"><tournament/></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D<span class='shorten'>ivisions</span></span>"><divisions/></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S<span class='shorten'>chools</span></span>"><schools class=""/></b-tab>
 			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
 		<b-alert v-else variant="warning" show class="mt-3">
@@ -286,8 +286,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	h4 {
 		text-shadow: 1px 1px 2px #ccc;
+	}
+	.card-header .nav-link:not(.active) .shorten {
+		display: none;
 	}
 </style>

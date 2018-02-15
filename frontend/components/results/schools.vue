@@ -1,7 +1,7 @@
 <template>
 	<div class="p-sm-3" ref="schools">
 		<b-row class="d-print-none mb-4" align-v="end">
-			<b-col cols="12" sm="auto">
+			<b-col cols="12" md="6" lg="auto">
 				<b-row align-v="center">
 					<!-- Division -->
 					<b-col cols="12">
@@ -17,7 +17,7 @@
 					</b-col>
 				</b-row>
 			</b-col>
-			<b-col cols="12" sm="" class="mt-3 mt-sm-0">
+			<b-col cols="12" md="" class="mt-3 mt-md-0">
 				<b-row align-v="end">
 					<!-- School -->
 					<b-col cols="12">
@@ -34,7 +34,7 @@
 							<font-awesome-icon :icon="['fas', 'print']"/>
 						</b-btn>
 					</b-col>
-					<b-col cols="auto pl-0">
+					<b-col v-if="isAdmin" cols="auto pl-0">
 						<b-btn 
 							variant="outline-dark" 
 							class=""
@@ -80,7 +80,8 @@ export default {
 	},
 	computed: {
 		...mapGetters({
-			t: "getTournament"
+			t: "getTournament",
+			isAdmin: "getIsAdmin"
 		}),
 		divisions() {
 			return params.D;

@@ -43,23 +43,23 @@
 			</div>
 			<b-tabs >
 				<!-- Registrations: view and print -->
-				<b-tab title="<span class='d-none d-sm-inline-block'>Records</span><span class='d-inline-block d-sm-none'>Recs</span>" active>
+				<b-tab title="<span class='d-none d-sm-inline-block'>Records</span><span class='d-inline-block d-sm-none'>Rec<span class='shorten'>ords</span></span>" active>
 					<records :credentials="credentials"/>
 				</b-tab>
 				<!-- Questions: edit -->
-				<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Qs</span>">
+				<b-tab title="<span class='d-none d-sm-inline-block'>Questions</span><span class='d-inline-block d-sm-none'>Q<span class='shorten'>uestions</span></span>">
 					<questions/>
 				</b-tab>
 				<!-- Scantron: integration with scantron -->
-				<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan</span>">
+				<b-tab title="<span class='d-none d-sm-inline-block'>Scantron</span><span class='d-inline-block d-sm-none'>Scan<span class='shorten'>trontron</span></span>">
 					<scantron :credentials="credentials"/>
 				</b-tab>
 				<!-- Results -->
-				<b-tab title="<span class='d-none d-sm-inline-block'>Results</span><span class='d-inline-block d-sm-none'>Res</span>">
+				<b-tab title="<span class='d-none d-sm-inline-block'>Results</span><span class='d-inline-block d-sm-none'>Res<span class='shorten'>ults</span></span>">
 					<results/>
 				</b-tab>
 				<!-- Maintenance -->
-				<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint</span>" title-item-class="ml-auto">
+				<b-tab title="<span class='d-none d-sm-inline-block'>Maintenance</span><span class='d-inline-block d-sm-none'>Maint<span class='shorten'>enance</span></span>" title-item-class="ml-auto">
 					<maintenance/>
 				</b-tab>
 			</b-tabs>
@@ -184,7 +184,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 	.login {
 	}
 	.form-control,
@@ -196,6 +196,9 @@ export default {
 	.btn:focus {
 		outline: 0;
 		box-shadow: none;
+	}
+	.nav-tabs .nav-link:not(.active) .shorten {
+		display: none;
 	}
 </style>
 
