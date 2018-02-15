@@ -29,19 +29,28 @@
 			hover>
 		</b-table>
 		<b-row class="page-no-break-inside mt-5" align-v="end">
-			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
+			<b-col cols="" sm="" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Top4 score </h5>
 				<div variant="light" class="panel p-0 d-flex justify-content-center align-items-center">
 					<span class="banner">{{t.divisions[division].schools[school].stats.top4}}</span>
 				</div>
 			</b-col>
-			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
+			<b-col cols="" sm="4" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Ciphering total</h5>
-				<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>	
+				<div variant="light" class="panel d-flex justify-content-center align-items-center">
+					<masked-input 
+						v-if="isAdmin" 
+						v-model="ciphering" 
+						mask="111" 
+						class="banner-input form-control"/>	
+					<span v-else class="banner">{{ciphering}}</span>
+				</div>	
 			</b-col>
 			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Match total</h5>
-				<div variant="light" class="panel d-flex justify-content-center align-items-center"></div>
+				<div variant="light" class="panel d-flex justify-content-center align-items-center">
+					<span class="banner">{{total}}</span>
+				</div>
 			</b-col>
 		</b-row>
 	</div> 
@@ -49,16 +58,25 @@
 
 <script>
 	import * as params from "../../../configs/params";
+	import { mapGetters } from 'vuex';
+	import maskedInput from 'vue-masked-input';
+	import { debounce } from 'lodash';
 	export default {
+		components: {
+			maskedInput
+		},
 		props: {
 			t: Object,
 			school: String,
 			division: String
 		},
 		data: () => ({
-
+			ciphering: ''
 		}),
 		computed: {
+			...mapGetters({
+				isAdmin: 'getIsAdmin',
+			}),
 			tableSchool() {
 				// Items
 				let items = [];
@@ -140,6 +158,11 @@
 				}
 				return {fields, items};
 			},
+			total() {
+				return this.t.divisions[this.division].schools[this.school].stats.top4 + parseInt(this.ciphering.replace(/\D/g,'') || '0');	
+			}
+		},
+		methods: {
 		}
 	}
 </script>
@@ -149,6 +172,15 @@
 		height: 5em;
 		border: 1px solid black;
 		border-radius: 10px;
+	}
+	.banner-input {
+		border: none;
+		font-size: xx-large;
+		font-weight: bold;
+		text-align: center;
+		padding: 0;
+		margin: 0;
+		color: #212529;
 	}
 </style>
 

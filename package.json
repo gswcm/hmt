@@ -71,6 +71,7 @@
 		"vue-axios": "^2.0.2",
 		"vue-clipboard2": "0.0.8",
 		"vue-loader": "^13.7.0",
+		"vue-masked-input": "^0.5.2",
 		"vue-recaptcha": "^1.1.0",
 		"vue-router": "^3.0.1",
 		"vue-socket.io": "^2.1.1-b",
