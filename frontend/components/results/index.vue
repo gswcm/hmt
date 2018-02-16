@@ -7,7 +7,7 @@
 		<b-tabs v-if="tournament" pills card class="mt-3">
 			<b-tab active title="<span class='d-none d-sm-inline-block'>Tournament</span><span class='d-inline-block d-sm-none'>T<span class='shorten'>ournament</span></span>"><tournament/></b-tab>
 			<b-tab title="<span class='d-none d-sm-inline-block'>Divisions</span><span class='d-inline-block d-sm-none'>D<span class='shorten'>ivisions</span></span>"><divisions/></b-tab>
-			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S<span class='shorten'>chools</span></span>"><schools class=""/></b-tab>
+			<b-tab title="<span class='d-none d-sm-inline-block'>Schools</span><span class='d-inline-block d-sm-none'>S<span class='shorten'>chools</span></span>"><schools/></b-tab>
 			<b-tab v-if="isAdmin && tournament" title="Log" title-item-class="ml-auto"><logs/></b-tab>
 		</b-tabs>
 		<b-alert v-else variant="warning" show class="mt-3">
@@ -218,7 +218,7 @@ export default {
 					}
 					school.stats.rank = school.stats.rank.sort((a,b) => b.score - a.score);
 					school.stats.top4 = school.stats.rank.slice(0,4).reduce((a,i) => a + i.score, 0);
-					school.stats.ciphering = (C.find(i => i.division === divisionKey && i.school === schoolKey) || {value:0}).value;
+					school.stats.ciphering = (C.find(i => i.division === divisionKey && i.school === schoolKey) || { value:0 }).value;
 					division.stats.rank.schools.push({
 						school: schoolKey,
 						score: school.stats.top4

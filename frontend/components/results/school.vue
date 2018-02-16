@@ -45,13 +45,13 @@
 						placeholder-char=" "
 						mask="111" 
 						class="banner-input form-control"/>	
-					<span v-else class="banner">{{ciphering}}</span>
+					<span v-else-if="ciphering > 0" class="banner">{{ciphering}}</span>
 				</div>	
 			</b-col>
 			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Match total</h5>
 				<div variant="light" class="panel d-flex justify-content-center align-items-center">
-					<span class="banner">{{total}}</span>
+					<span v-if="isAdmin || (ciphering > 0)" class="banner">{{total}}</span>
 				</div>
 			</b-col>
 		</b-row>
@@ -75,6 +75,11 @@
 		data: () => ({
 			ciphering: 0
 		}),
+		watch: {
+			t() {
+				this.ciphering = this.t.divisions[this.division].schools[this.school].stats.ciphering;
+			}
+		},
 		created() {
 			this.ciphering = this.t.divisions[this.division].schools[this.school].stats.ciphering;
 		},

@@ -14,7 +14,7 @@ router.post("/results/ciphering", (req, res) => {
 		if(!ciphering) {
 			ciphering = new Ciphering({division,school});
 		}
-		if(value) {
+		if(typeof value === 'number' && value >= 0) {
 			ciphering.value = value;
 		}
 		return ciphering.save();
