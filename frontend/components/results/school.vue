@@ -40,7 +40,7 @@
 				<div variant="light" class="panel d-flex justify-content-center align-items-center">
 					<masked-input 
 						v-if="isAdmin" 
-						:value="ciphering.toString()" 
+						:value="(ciphering > 0) ? ciphering.toString() : ''" 
 						@input="cipheringUpdate"
 						placeholder-char=" "
 						mask="111" 
@@ -51,7 +51,7 @@
 			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Match total</h5>
 				<div variant="light" class="panel d-flex justify-content-center align-items-center">
-					<span v-if="isAdmin || (ciphering > 0)" class="banner">{{total}}</span>
+					<span v-if="ciphering > 0" class="banner">{{total}}</span>
 				</div>
 			</b-col>
 		</b-row>
