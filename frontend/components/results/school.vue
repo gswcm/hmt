@@ -76,12 +76,15 @@
 			ciphering: 0
 		}),
 		watch: {
-			t() {
-				this.ciphering = this.t.divisions[this.division].schools[this.school].stats.ciphering;
+			t() { 
+				this.cipheringRefresh();
+			},
+			school() {
+				this.cipheringRefresh();
 			}
 		},
 		created() {
-			this.ciphering = this.t.divisions[this.division].schools[this.school].stats.ciphering;
+			this.cipheringRefresh();
 		},
 		computed: {
 			...mapGetters({
@@ -173,6 +176,11 @@
 			}
 		},
 		methods: {
+			cipheringRefresh() {
+				if(this.division && this.school) {
+					this.ciphering = this.t.divisions[this.division].schools[this.school].stats.ciphering;
+				}
+			},
 			cipheringUpdate: debounce(function(value = '') {
 				value = parseInt(value.replace(/\D/g,'') || '0');
 				this.axios
