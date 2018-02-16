@@ -75,7 +75,7 @@ export default {
 		}
 	},
 	methods: {
-		process({R,Q,S}) {
+		process({R,Q,S,C}) {
 			let questions = {
 				lengths: {},
 				origin: Q
@@ -218,6 +218,7 @@ export default {
 					}
 					school.stats.rank = school.stats.rank.sort((a,b) => b.score - a.score);
 					school.stats.top4 = school.stats.rank.slice(0,4).reduce((a,i) => a + i.score, 0);
+					school.stats.ciphering = (C.find(i => i.division === divisionKey && i.school === schoolKey) || {value:0}).value;
 					division.stats.rank.schools.push({
 						school: schoolKey,
 						score: school.stats.top4
@@ -272,7 +273,7 @@ export default {
 					throw error;
 				} 
 				else {
-					this.process(response.data.rqs);
+					this.process(response.data.rqsc);
 				}
 			})
 			.catch(error => {

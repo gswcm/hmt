@@ -40,7 +40,9 @@
 				<div variant="light" class="panel d-flex justify-content-center align-items-center">
 					<masked-input 
 						v-if="isAdmin" 
-						v-model="ciphering" 
+						:value="ciphering.toString()" 
+						@input="cipheringUpdate"
+						placeholder-char=" "
 						mask="111" 
 						class="banner-input form-control"/>	
 					<span v-else class="banner">{{ciphering}}</span>
@@ -49,7 +51,7 @@
 			<b-col cols="12" sm="" class="page-no-break-inside mt-3 mt-sm-0">
 				<h5 class="ml-3">Match total</h5>
 				<div variant="light" class="panel d-flex justify-content-center align-items-center">
-					<span v-if="isAdmin" class="banner">{{total}}</span>
+					<span class="banner">{{total}}</span>
 				</div>
 			</b-col>
 		</b-row>
@@ -71,8 +73,11 @@
 			division: String
 		},
 		data: () => ({
-			ciphering: ''
+			ciphering: 0
 		}),
+		created() {
+			this.ciphering = this.t.divisions[this.division].schools[this.school].stats.ciphering;
+		},
 		computed: {
 			...mapGetters({
 				isAdmin: 'getIsAdmin',
@@ -159,10 +164,35 @@
 				return {fields, items};
 			},
 			total() {
-				return this.t.divisions[this.division].schools[this.school].stats.top4 + parseInt(this.ciphering.replace(/\D/g,'') || '0');	
+				return this.t.divisions[this.division].schools[this.school].stats.top4 + this.ciphering;	
 			}
 		},
 		methods: {
+			cipheringUpdate: debounce(function(value = '') {
+				value = parseInt(value.replace(/\D/g,'') || '0');
+				this.axios
+				.post("/api/results/ciphering", {
+					division: this.division,
+					school: this.school,
+					value
+				})
+				.then(response => {
+					if (response.data.status) {
+						//-- server error
+						let error = response.data.error || new Error("not sure");
+						throw error;
+					} 
+					else {
+						this.ciphering = response.data.ciphering.value;
+					}
+				})
+				.catch(error => {
+					this.$noty.error(
+						`Something went wrong... more specifically: ${error.message}`
+					);
+					console.error(error.stack);
+				});
+			}, 500)
 		}
 	}
 </script>

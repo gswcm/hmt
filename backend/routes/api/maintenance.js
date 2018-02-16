@@ -8,8 +8,9 @@ const Scan = require("../../lib/models/scan");
 const Counter = require("../../lib/models/counter");
 const Archive = require("../../lib/models/archive");
 const Registration = require("../../lib/models/registration");
+const Ciphering = require("../../lib/models/ciphering");
 const evalCredentials = require("../../lib/utils").evalCredentials;
-const getRawRQS = require("../../lib/rqs").getRawRQS;
+const getRawRQSC = require("../../lib/rqsc").getRawRQSC;
 
 
 router.post("/mtn/timeline", (req,res) => {
@@ -51,22 +52,14 @@ router.post("/mtn/archive", (req,res) => {
 	}
 	evalCredentials(credentials)
 	.then(() => {
-		return getRawRQS();
+		return getRawRQSC();
 	})
-	.then(rqs => {
-		return Archive.findOneAndUpdate({year}, {
-			year,
-			r: rqs.r,
-			q: rqs.q,
-			s: rqs.s	
-		},
-		{
-			upsert: true
-		});
+	.then(rqsc => {
+		return Archive.findOneAndUpdate({year}, {	year, ...rqsc }, { upsert: true });
 	})
-	.then((rqs) => {
+	.then((rqsc) => {
 		return res.json({ 
-			rqs,
+			rqsc,
 			status: 0,
 		});
 	})
@@ -100,6 +93,9 @@ router.post("/mtn/removeThisYear", (req,res) => {
 	})
 	.then(() => {
 		return Counter.deleteMany();
+	})
+	.then(() => {
+		return Ciphering.deleteMany();
 	})
 	.then(() => {
 		res.json({

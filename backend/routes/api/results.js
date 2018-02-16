@@ -1,8 +1,37 @@
 const express = require("express");
 const errToJSON = require("error-to-json");
-const rqs = require("../../lib/rqs");
+const rqsc = require("../../lib/rqsc");
 const Archive = require("../../lib/models/archive");
+const Ciphering = require("../../lib/models/ciphering");
 const router = express.Router();
+
+router.post("/results/ciphering", (req, res) => {
+	let division = req.body.division;
+	let school = req.body.school;
+	let value = req.body.value;
+	Ciphering.findOne({division,school})
+	.then(ciphering => {
+		if(!ciphering) {
+			ciphering = new Ciphering({division,school});
+		}
+		if(value) {
+			ciphering.value = value;
+		}
+		return ciphering.save();
+	})
+	.then(ciphering => {
+		return res.json({ 
+			ciphering,
+			status: 0,
+		});
+	})
+	.catch(error => {
+		res.json({
+			status: 500,
+			error: errToJSON(error)
+		});
+	});
+});
 
 router.post("/results/years", (req, res) => {
 	Archive.find({},{year:1})
@@ -22,11 +51,11 @@ router.post("/results/years", (req, res) => {
 
 router.post("/results/get", (req, res) => {
 	let year = req.body.year;
-	rqs.getRQS(year)
-	.then(rqs => {
+	rqsc.getRQSC(year)
+	.then(rqsc => {
 		return res.json({ 
 			status: 0,
-			rqs
+			rqsc
 		});
 	})
 	.catch(error => {

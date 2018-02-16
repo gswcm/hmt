@@ -1,13 +1,14 @@
 const Q = require("./models/q");
 const S = require("./models/scan");
 const R = require("./models/registration");
+const C = require("./models/ciphering");
 const Archive = require("./models/archive");
 const _ = require("lodash");
 
 module.exports = {
-	getRawRQS(year) {
+	getRawRQSC(year) {
 		if(year) {
-			return Archive.findOne({year},{r:1,q:1,s:1});
+			return Archive.findOne({year},{r:1,q:1,s:1,c:1});
 		}
 		else {
 			return R.find({main: {$ne:null}})
@@ -24,23 +25,30 @@ module.exports = {
 					let q = rq.q;
 					return Promise.resolve({r,q,s});
 				});
+			})
+			.then(rqs => {
+				return C.find({})
+				.then(c => {
+					return Promise.resolve({c,...rqs});	
+				});
 			});
 		}
 	},
-	getRQS: (year) => {
-		return module.exports.getRawRQS(year)
-		.then(rqs => {
-			if(!rqs) {
+	getRQSC: (year) => {
+		return module.exports.getRawRQSC(year)
+		.then(rqsc => {
+			if(!rqsc) {
 				return Promise.reject(new Error(`Archive for ${year} year not found`));
 			}
 			let r = {};
-			for(let i of rqs.r) {
+			for(let i of rqsc.r) {
 				r[i.seq] = { ..._.pick(i.main,['team','school','sponsor']), seq:i.seq, email:i.email };
 			}
 			return Promise.resolve({
 				R: r,
-				Q: rqs.q[0].questions.map(i => _.pick(i,['cat','key'])),
-				S: rqs.s.map(i => i.data)
+				Q: rqsc.q[0].questions.map(i => _.pick(i,['cat','key'])),
+				S: rqsc.s.map(i => i.data),
+				C: rqsc.c.map(i => _.pick(i, ['division', 'school', 'value']))
 			});
 		});
 	}

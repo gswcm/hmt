@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const scan = require('./scan');
 const q = require('./q');
 const registration = require('./registration');
+const ciphering = require('./ciphering');
 
 const archiveSchema = mongoose.Schema({
 	year: {
@@ -21,6 +22,11 @@ const archiveSchema = mongoose.Schema({
 	//-- Registrations
 	r: {
 		type: [registration],
+		default: []
+	},
+	//-- Cipherings
+	c: {
+		type: [ciphering],
 		default: []
 	}
 })
