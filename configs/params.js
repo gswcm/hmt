@@ -1,4 +1,5 @@
 export const Q = {
+	// Questions categories with labels
 	ALGE: "Algebra",
 	ANGE: "Analytical geometry",
 	GEOM: "Geometry",
@@ -7,6 +8,7 @@ export const Q = {
 };
 
 export const D = {
+	// School divisions
 	GISA: {
 		label: 'GISA (private schools)',
 		values: [
@@ -26,6 +28,18 @@ export const D = {
 			"GHSA AAAAAAA",
 		]
 	}
+};
+
+export const T = {
+	// T-Shirt sizes
+	values: [
+		"XS",
+		"S",
+		"M",
+		"L",
+		"XL",
+		"XXL"
+	]
 };
 
 export const studentsPerTeam = 8;

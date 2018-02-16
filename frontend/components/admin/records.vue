@@ -25,23 +25,14 @@
 				</b-form-group>
 				<!-- Division -->
 				<b-form-group label="School <span class='text-info'>division</span>">
+					<!-- Division -->
 					<b-select 
 						:value="filter.division" 
 						:state="null"
 						@input="filterUpdated('division',$event)">
 						<option :value="null">--</option>
-						<optgroup label="GISA (private schools)">	
-							<option value="GISA AA">GISA AA</option>
-							<option value="GISA AAA">GISA AAA</option>
-						</optgroup>
-						<optgroup label="GHSA (public schools)">	
-							<option value="GHSA A">GHSA A</option>
-							<option value="GHSA AA">GHSA AA</option>
-							<option value="GHSA AAA">GHSA AAA</option>
-							<option value="GHSA AAAA">GHSA AAAA</option>
-							<option value="GHSA AAAAA">GHSA AAAAA</option>
-							<option value="GHSA AAAAAA">GHSA AAAAAA</option>
-							<option value="GHSA AAAAAAA">GHSA AAAAAAA</option>
+						<optgroup v-for="optionGroup in Object.keys(divisions)" :key="optionGroup" :label="divisions[optionGroup].label">
+							<option v-for="option in divisions[optionGroup].values" :value="option" :key="option">{{option}}</option>
 						</optgroup>
 					</b-select>
 				</b-form-group>
@@ -64,25 +55,71 @@
 					</b-form-radio-group>
 				</b-form-group>
 			</div>
-			<div class="mt-3">
-				<!-- Refresh -->
-				<b-btn variant="outline-dark" @click="refresh">
-					<!-- <i class="fa fa-refresh" aria-hidden="true"></i> -->
-					<font-awesome-icon :icon="['fas', 'sync-alt']"/>
-					Refresh
-				</b-btn>
-				<!-- Download all -->
-				<b-btn variant="outline-dark" class="ml-3" @click="printMany">
-					<!-- <i class="fa fa-download" aria-hidden="true"></i> -->
-					<font-awesome-icon :icon="['fas', 'download']"/>
-					Download all
-				</b-btn>
-			</div>
+			<b-alert show variant="warning" class="p-3 mt-3">
+				<div class="d-flex justify-content-between">
+					<!-- Refresh -->
+					<b-btn variant="outline-dark" @click="refresh" v-b-tooltip.hover title="Refresh filtered results">
+						<!-- <i class="fa fa-refresh" aria-hidden="true"></i> -->
+						<font-awesome-icon :icon="['fas', 'sync-alt']"/>					
+					</b-btn>
+					<b-btn class="" variant="outline-dark" v-clipboard:copy="records.map(i => i.email)" v-clipboard:success="onCopy" v-b-tooltip.hover title="Copy all emails to clipboard">
+						<font-awesome-icon :icon="['fas', 'copy']"/>
+						All
+					</b-btn>
+					<!-- Download all -->
+					<b-btn variant="outline-dark" @click="printMany" v-b-tooltip.hover title="Download PDF for all filtered registrations">
+						<!-- <i class="fa fa-download" aria-hidden="true"></i> -->
+						<font-awesome-icon :icon="['fas', 'download']"/>
+						All
+					</b-btn>
+					<!-- Add new registration -->
+					<b-btn variant="outline-dark" v-b-modal.addRegistration v-b-tooltip.hover title="Add new registration and bypass confirmation process">
+						<font-awesome-icon :icon="['fas', 'plus']"/>
+						New
+					</b-btn>		
+				</div>
+			</b-alert>
+			<b-modal 
+				id="addRegistration" 
+				centered 
+				no-fade
+				size="lg" 
+				hide-footer
+				ref="newReg"
+				title="New registration">
+				<form>
+					<b-alert show variant="info" class="p-3">
+						<b-row align-v="center" class="my-2">
+							<b-col cols="12" sm="auto">
+								<label><strong>Sponsor's e-mail</strong></label>
+							</b-col>
+							<b-col cols="12" sm="">
+								<b-form-input v-model="newRegistration.email" type="email" placeholder="sponsor's e-mail"/>
+							</b-col>
+						</b-row>
+					</b-alert>
+					<registration 
+						:value="newRegistration.value" 
+						:options="{
+							debug: false,
+							ro: false,
+						}"
+						@input="updateNewRegistration"/>						
+					<b-alert show variant="secondary" class="p-3">
+						<div class="d-flex justify-content-start">
+							<b-btn class="" variant="outline-danger" @click.prevent="resetNewRegistration">Reset</b-btn>										
+							<b-btn :disabled="!newRegistration.status" class="ml-auto" variant="outline-dark" @click="addRegistration">Add</b-btn>										
+							<b-btn class="ml-3" variant="dark" @click="$refs.newReg.hide()">Cancel</b-btn>										
+						</div>
+					</b-alert>
+				</form>				
+			</b-modal>
 		</b-col>
 		<b-col cols="auto" class="d-none d-md-block px-0 border-left"></b-col>
 		<b-col cols="12" md>
-			<div v-if="options.length" class="mt-3">	
-				<b-alert show variant="info">
+			<!-- Display/Edit existing registration -->
+			<div v-if="options.length" class="">	
+				<b-alert show variant="info" class="pt-4">
 					<!-- Select the school -->
 					<b-row align-v="center">
 						<b-col cols="3" sm="auto" md="3" lg="auto">
@@ -97,7 +134,7 @@
 								<!-- <i class="fa fa-check" aria-hidden="true"></i> -->
 								<font-awesome-icon :icon="['fas', 'check']"/>
 							</b-btn>
-							<b-btn class="" variant="outline-dark" v-b-modal.removeRecord v-b-tooltip.hover title="Remove registration record">
+							<b-btn class="" variant="outline-dark" v-b-modal.removeRecord v-b-tooltip.hover title="Remove registration">
 								<!-- <i class="fa fa-trash" aria-hidden="true"></i> -->
 								<font-awesome-icon :icon="['fas', 'trash-alt']"/>
 							</b-btn>
@@ -105,7 +142,7 @@
 								<!-- <i class="fa fa-clipboard" aria-hidden="true"></i> -->
 								<font-awesome-icon :icon="['fas', 'copy']"/>
 							</b-btn>
-							<b-btn class="" variant="outline-dark" v-b-tooltip.hover title="Download printable PDF" @click="printOne(reg)">
+							<b-btn class="" variant="outline-dark" v-b-tooltip.hover title="Download PDF for the selected registration" @click="printOne(reg)">
 								<!-- <i class="fa fa-download" aria-hidden="true"></i> -->
 								<font-awesome-icon :icon="['fas', 'download']"/>
 							</b-btn>
@@ -161,17 +198,19 @@
 import { mapGetters } from 'vuex';
 import { debounce, escapeRegExp, pick } from "lodash";
 import registration from "../form/registration.vue";
+import * as params from "../../../configs/params";
 import jsPDF from "jspdf";
 import { sprintf } from "sprintf-js";
 export default {
 	components: {
-		registration,
+		registration
 	},
 	data: () => ({
 		registration: {
 			value: {},
 			status: null
 		},
+		newRegistration: {},
 		records: [],
 		filter: {
 			paid: null,
@@ -185,12 +224,16 @@ export default {
 		email: "",
 	}),
 	created() {
+		this.resetNewRegistration();
 		this.refresh();
 	},
 	computed: {	
 		...mapGetters({
 			credentials: 'getCredentials',
 		}),
+		divisions() {
+			return params.D;
+		},
 		paid() {
 			let record = this.records.find(i => i.email === this.email);
 			return record ? record.paid : false;
@@ -214,15 +257,67 @@ export default {
 		}
 	},
 	methods: {		
+		resetNewRegistration() {
+			this.newRegistration = {
+				value: {
+					sponsor: {
+						name: '',
+						phone: ''
+					},
+					school: {
+						name: '',
+						division: null
+					},
+					team: {
+						names: [
+							''
+						],
+						meals: 0,
+						tshirts: []
+					}
+				},
+				status: false,
+				email: ''
+			}
+		},
+		addRegistration() {	
+			this.$refs.newReg.hide();
+			console.log(JSON.stringify(this.newRegistration, null, 3));
+			this.axios
+			.post("/api/admin/create", {
+				email: this.newRegistration.email,
+				registration: this.newRegistration.value,
+				credentials: this.credentials
+			})
+			.then(response => {
+				if (response.data.status) {
+					//-- server error
+					let error = response.data.error || new Error("not sure");
+					throw error;
+				} 
+				else {
+					this.$noty.success(`Registration for ${response.data.email} has been created`);
+					this.refresh();
+				}
+			})
+			.catch(error => {
+				this.$noty.error(
+					`Something went wrong... more specifically: ${error.message}`
+				);
+				console.error(error.stack);
+			});
+		},
+		updateNewRegistration(data) {
+			this.newRegistration = {email: this.newRegistration.email, ...data};
+		},
 		printMany() {
-			this.records
-				.reduce((a, i) => this.printOne(i, false, a), null)
-				.save("bulk.pdf");
+			this.records.reduce((a, i) => this.printOne(i, false, a), null).save("bulk.pdf");
 		},
 		printOne(reg, output = true, doc = null) {
 			if (doc) {
 				doc.addPage();
-			} else {
+			} 
+			else {
 				doc = new jsPDF({
 					orientation: "p",
 					unit: "mm",
@@ -276,7 +371,7 @@ export default {
 			}
 		},
 		onCopy() {
-			this.$noty.success(`E-mail copied into clipboard`);
+			this.$noty.success(`E-mail(s) copied into clipboard`);
 		},
 		activeRegistrationUpdateHandler(data) {
 			this.registration.value = data.value,
@@ -297,11 +392,7 @@ export default {
 					throw error;
 				} 
 				else {
-					this.$noty.success(
-						`Registration for ${
-							response.data.email
-						} has been updated`
-					);
+					this.$noty.success(`Registration for ${response.data.email} has been updated`);
 					this.refresh();
 				}
 			})
@@ -323,7 +414,8 @@ export default {
 					//-- server error
 					let error = response.data.error || new Error("not sure");
 					throw error;
-				} else {
+				} 
+				else {
 					this.$noty.success(
 						`Registration for ${
 							response.data.email
@@ -350,7 +442,8 @@ export default {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} else {
+					} 
+					else {
 						this.$noty.success(
 							`Registration record for ${
 								response.data.email
@@ -378,7 +471,8 @@ export default {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} else {
+					} 
+					else {
 						this.$noty.success(
 							`Payment status has been updated to '${
 								response.data.paid ? "paid" : "not paid"
@@ -448,13 +542,15 @@ export default {
 						//-- server error
 						let error = response.data.error || new Error("not sure");
 						throw error;
-					} else {
+					} 
+					else {
 						this.records = response.data.records;
 						if (this.records.length) {
 							if (!this.records.find(i => i.email === this.email)) {
 								this.email = this.records[0].email;
 							}
-						} else {
+						} 
+						else {
 							this.email = null;
 						}
 					}
@@ -479,5 +575,10 @@ export default {
 	}
 	.nav-tabs:focus {
 		outline: none;
+	}
+	.modal-open {
+		position: fixed;
+		width: 100%;
+		height: 100%;
 	}
 </style>

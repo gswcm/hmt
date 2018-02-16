@@ -120,6 +120,43 @@ router.post("/admin/confirm", (req, res) => {
 	});
 });
 
+router.post("/admin/create", (req, res) => {
+	let email = req.body.email;
+	let credentials = req.body.credentials;
+	let value = req.body.registration;
+	evalCredentials(credentials)
+	.then(() => {
+		return Registration.findOne({ email });
+	})
+	.then(registration => {
+		if(registration) {
+			return Promise.reject(new Error('Registration with specified e-mail already exists'));
+		}
+		registration = new Registration({
+			email,
+			main: value,
+			temp: value
+		});
+		return registration.save();
+	})
+	.then(() => {
+		return new Account({ email }).save();
+	})
+	.then(() => {
+		return res.json({ 
+			email,
+			status: 0 
+		});
+	})
+	.catch(error => {
+		res.json({
+			status: 500,
+			error: errToJSON(error)
+		});
+	});
+});
+
+
 router.post("/admin/update", (req, res) => {
 	let email = req.body.email;
 	let credentials = req.body.credentials;

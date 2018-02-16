@@ -28,6 +28,8 @@
 </template>
 
 <script>
+	import { mapGetters } from "vuex";
+	import moment from 'moment';
 	import { cloneDeep } from 'lodash';
 	import sponsor from './sponsor.vue';
 	import team from './team.vue';
@@ -54,6 +56,18 @@
 			status: false,
 			total: ""
 		}),
+		computed: {
+			...mapGetters({
+				eventDate: 'getEventDate',
+			}),
+			dates() {
+				let event = moment(this.eventDate).startOf('day');
+				let payment = moment(event).subtract(1,'months');
+				return {
+					event, payment
+				};
+			},
+		},
 		created() {
 			this.runtime.value = cloneDeep(this.value);
 		},
@@ -81,7 +95,7 @@
 					let tshirts = base.team.tshirts.reduce((a,i) => a + parseInt(i.qty), 0) * 10;
 					let meals = parseInt(base.team.meals) * 7.5;	
 					let arr = [75,100].map(i => meals + tshirts + ((base.team.names.length < 9) ? i : i + (base.team.names.length - 8) * 5));
-					this.total = `\$${arr[0]} (${arr[1]})`;
+					this.total = moment().isBefore(this.dates.payment) ? `\$${arr[0]}` : `\$${arr[1]}`;
 				}
 				else {
 					this.total = "N/A";

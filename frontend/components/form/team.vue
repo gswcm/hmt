@@ -7,7 +7,7 @@
 			<!-- Names -->
 			<b-row align-h="between" align-v="center" class="my-3">
 				<b-col cols="auto">
-					<h5 class="text-info">Members <small v-show="!ro">(see note below)</small></h5>
+					<h5 class="text-info">Members <small v-show="!ro && !isAdmin">(see note below)</small></h5>
 				</b-col>
 				<b-col cols="auto" v-show="!ro">
 					<b-btn 
@@ -17,47 +17,81 @@
 					</b-btn>
 				</b-col>
 			</b-row>
-			<b-form-group 	
-				v-for="(name,index) in runtime.value.names"
-				:key="`name_${index}`">						
-				<b-row align-v="center">
-					<b-col cols="12" sm="auto">	
-						<label >Student name {{index+1}}</label>
-					</b-col>
-					<b-col col sm>
-						<b-form-input 
-							type="text" 
-							:disabled="ro"
-							:value="name"
-							:state="!/^\s*$/.test(name) ? null : false"
-							@input="update(['names'],`${index}`,$event)"
-							placeholder="don't leave me empty">
-						</b-form-input>		
-					</b-col>
-					<b-col cols="auto" sm="auto" v-show="!ro">
-						<b-btn 
-							:disabled="runtime.value.names.length < 3"
-							variant="outline-secondary" 
-							@click="removeName(index)">
-							Remove
-						</b-btn>
-					</b-col>
-				</b-row>
-			</b-form-group>
-			<p v-if="!ro" class="mt-3 pl-3 border border-bottom-0 border-top-0 border-right-0 border-dark">
+			<!-- Main team -->
+			<b-alert show variant="success" class="mb-0" v-b-tooltip.hover title="Main team">
+				<b-form-group 					
+					v-for="(name,index) in runtime.value.names.filter((e,i) => (i < studentsPerTeam))"
+					:key="`name_${index}`">							
+					<b-row align-v="center">
+						<b-col cols="12" sm="auto">	
+							<label >Student name {{index+1}}</label>
+						</b-col>
+						<b-col col sm>
+							<b-form-input 
+								type="text" 
+								:disabled="ro"
+								:value="name"
+								:state="!/^\s*$/.test(name) ? null : false"
+								@input="update(['names'],`${index}`,$event)"
+								placeholder="don't leave me empty">
+							</b-form-input>		
+						</b-col>
+						<b-col cols="auto" sm="auto" v-show="!ro">
+							<b-btn 
+								:disabled="runtime.value.names.length < 3"
+								variant="outline-secondary" 
+								@click="removeName(index)">
+								Remove
+							</b-btn>
+						</b-col>
+					</b-row>
+				</b-form-group>				
+			</b-alert>			
+			<!-- Secondary team(s) -->
+			<b-alert v-if="runtime.value.names.length > studentsPerTeam" show variant="light" class="mt-0">
+				<b-form-group 					
+					v-for="(name,index) in runtime.value.names.filter((e,i) => (i >= studentsPerTeam))"
+					:key="`name_${index+studentsPerTeam}`">							
+					<b-row align-v="center">
+						<b-col cols="12" sm="auto">	
+							<label >Student name {{index+studentsPerTeam+1}}</label>
+						</b-col>
+						<b-col col sm>
+							<b-form-input 
+								type="text" 
+								:disabled="ro"
+								:value="name"
+								:state="!/^\s*$/.test(name) ? null : false"
+								@input="update(['names'],`${index+studentsPerTeam}`,$event)"
+								placeholder="don't leave me empty">
+							</b-form-input>		
+						</b-col>
+						<b-col cols="auto" sm="auto" v-show="!ro">
+							<b-btn 
+								:disabled="runtime.value.names.length < 3"
+								variant="outline-secondary" 
+								@click="removeName(index+studentsPerTeam)">
+								Remove
+							</b-btn>
+						</b-col>
+					</b-row>
+				</b-form-group>
+	
+			</b-alert>			<p v-if="!ro && !isAdmin" class="mt-3 pl-3 border border-bottom-0 border-top-0 border-right-0 border-dark">
 				<strong>Note</strong>: The team registration cost is calculated based on the number of participants and payment date:
 				<ul>
 					<li>
 						If paid <strong>before {{dates.payment.format('LL')}}</strong>.
-						The cost is <strong>$75</strong> for the first 8 members and <strong>$5</strong> for each extra participants
+						The cost is <strong>$75</strong> for the first 8 members (main team) and <strong>$5</strong> for each extra participants
 					</li>
 					<li>
 						If paid <strong>after {{dates.payment.format('LL')}}</strong>.
-						The cost is <strong>$100</strong> for the first 8 members and <strong>$5</strong> for each extra participants
+						The cost is <strong>$100</strong> for the first 8 members (main team) and <strong>$5</strong> for each extra participants
 					</li>
 				</ul>
-				The <strong>Total</strong> below shows both cases.
+				The <strong>Total</strong> amount below is adjusted to account today's date.
 			</p>	
+			<hr class="my-4">
 			<!-- T-Shirts -->
 			<b-row align-h="between" align-v="center" class="my-3" v-show="showTShirts">
 				<b-col cols="auto">
@@ -80,19 +114,14 @@
 						<label>Size/Qty</label>
 					</b-col>
 					<b-col col sm>
-						<b-select
+						<b-select 
 							:disabled="ro"
 							:value="tshirt.size"
 							:state="tshirt.size !== null ? null : false"
 							@input="update(['tshirts',`${index}`],'size',$event)">
 							<option :value="null">Please select t-shirt size</option>
-							<option value="XS">XS</option>
-							<option value="S">S</option>
-							<option value="M">M</option>
-							<option value="L">L</option>
-							<option value="XL">XL</option>
-							<option value="XXL">XXL</option>
-						</b-select>		
+							<option v-for="option in tShirtSizes.values" :value="option" :key="option">{{option}}</option>
+						</b-select>
 					</b-col>
 					<b-col cols="2">
 						<b-form-input 
@@ -143,6 +172,7 @@
 
 <script>
 	import moment from 'moment';
+	import * as params from "../../../configs/params";
 	import { mapGetters } from 'vuex';
 	const { cloneDeep } = require('lodash');
 	export default {
@@ -158,12 +188,19 @@
 				value: {},
 				status: {}
 			},
-			status: false,
+			status: false,			
 		}),
 		computed: {
 			...mapGetters({
 				eventDate: 'getEventDate',
+				isAdmin: 'getIsAdmin'
 			}),
+			studentsPerTeam() {
+				return params.studentsPerTeam;
+			},
+			tShirtSizes() {
+				return params.T;
+			},
 			dates() {
 				let event = moment(this.eventDate).startOf('day');
 				let payment = moment(event).subtract(1,'months');

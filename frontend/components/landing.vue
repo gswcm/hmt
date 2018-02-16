@@ -21,7 +21,7 @@
 						</span>
 					</p>
 					<p v-if="!isBefore.payment" class="test-justify">
-						It seems that payment deadline has already passed. If you didn't pay yet, please do it at your earliest chance --- go to the registration page to see your balance and pay the second (larger) amount. It includes both the cost of registration and the late payment fee.
+						It seems that payment deadline has already passed. If you didn't pay yet, please do it at your earliest chance --- go to the registration page to see your <strong>actual</strong> balance that includes both the cost of the registration and the late payment fee.
 					</p>
 					<div v-if="years.length">
 						<h4 class="mt-4">Previous years(s) results</h4>
@@ -36,7 +36,7 @@
 							</ul>
 						</p>
 					</div>
-					<b-alert show variant="info" v-if="showStat" class="text-justify mt-4">
+					<b-alert show dismissible variant="info" v-if="showStat" class="text-justify mt-4">
 						So far we received registrations from <span class="text-danger">{{summary.numTeams}} teams</span> bringing <span class="text-danger">{{summary.numStudents}} students</span>.
 					</b-alert>
 					<div class="d-flex justify-content-center mt-5">

@@ -9,7 +9,7 @@
 					</b-col>
 					<b-col>
 						<b-select v-model="division">
-							<option :value="null">Please select the school division</option>
+							<option :value="null">--</option>
 							<optgroup v-for="optionGroup in Object.keys(divisions)" :key="optionGroup" :label="divisions[optionGroup].label">
 								<option v-for="option in divisions[optionGroup].values" :disabled="!(option in t.divisions)" :value="option" :key="option">{{option}}</option>
 							</optgroup>
