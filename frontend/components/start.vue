@@ -1,5 +1,5 @@
 <template>
-	<b-container>
+	<b-container v-if="isBefore.update">
 		<fieldset class="mt-3">
 			<legend>
 				Who are you?
@@ -81,6 +81,7 @@
 
 <script>
 	import { debounce } from 'lodash';
+	import moment from 'moment';
 	import registration from './form/registration.vue';
 	import InvisibleRecaptcha from './misc/InvisibleRecaptcha.vue';
 	import { mapGetters } from 'vuex';
@@ -102,17 +103,42 @@
 			override: false,
 			reCAPTCHA_sitekey: ''
 		}),
+		beforeRouteEnter(to, from, next) {
+			next(vm => {
+				if(!vm.isBefore.update) {
+					vm.$router.replace('/');
+				}
+			});
+		},
 		created() {
 			this.emailUpdated(this.email);			
 		},
 		mounted() {
-			this.$nextTick(() => this.$refs.email.focus());
+			this.$nextTick(() => {
+				if(this.$refs && this.$refs.email) {
+					this.$refs.email.focus();
+				}
+			});
 		},
 		computed: {
 			...mapGetters({
 				email: 'getEmail',
 				isAdmin: 'getIsAdmin',
+				eventDate: 'getEventDate',
 			}),
+			dates() {
+				let event = moment(this.eventDate).startOf('day');
+				let update = moment(event).subtract(1,'days');
+				return {
+					event, update
+				};
+			},
+			isBefore() {
+				let update = moment().isBefore(this.dates.update);
+				return { 
+					update
+				};
+			},
 			//-- email handlers
 			emailIsValid() {
 				return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,8}$/.test(this.email);

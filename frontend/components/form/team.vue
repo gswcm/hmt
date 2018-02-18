@@ -76,8 +76,8 @@
 						</b-col>
 					</b-row>
 				</b-form-group>
-	
-			</b-alert>			<p v-if="!ro && !isAdmin" class="mt-3 pl-3 border border-bottom-0 border-top-0 border-right-0 border-dark">
+			</b-alert>			
+			<p v-if="!ro && !isAdmin" class="mt-3 pl-3 border border-bottom-0 border-top-0 border-right-0 border-dark">
 				<strong>Note</strong>: The team registration cost is calculated based on the number of participants and payment date:
 				<ul>
 					<li>

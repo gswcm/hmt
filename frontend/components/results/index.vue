@@ -1,5 +1,5 @@
 <template>
-	<div class="p-3">
+	<div class="p-3" v-if="$route.query.year || (!isBefore.results && isBefore.close)">
 		<div class="d-flex flex-column align-items-center d-print-none">
 			<h4 v-if="'year' in $route.query" class="my-3">Archive for {{$route.query.year}} year</h4>
 			<h4 @click="refresh"> Tournament results are categorized and displayed below</h4>
@@ -43,11 +43,9 @@ export default {
 	},
 	beforeRouteEnter(to, from, next) {
 		next(vm => {
-			// if(!vm.isAdmin) {
-				if(!vm.$route.query.year && (vm.isBefore.results || !vm.isBefore.close)) {
-					vm.$router.replace('/');
-				}
-			// }
+			if(!vm.$route.query.year && (vm.isBefore.results || !vm.isBefore.close)) {
+				vm.$router.replace('/');
+			}
 		});
 	},
 	watch: {
