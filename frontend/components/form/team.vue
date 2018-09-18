@@ -10,7 +10,7 @@
 					<h5 class="text-info">Members <small v-show="!ro && !isAdmin">(see note below)</small></h5>
 				</b-col>
 				<b-col cols="auto" v-show="!ro">
-					<b-btn 
+					<b-btn
 						variant="outline-info"
 						@click="addName">
 						Add more...
@@ -19,64 +19,64 @@
 			</b-row>
 			<!-- Main team -->
 			<b-alert show variant="success" class="mb-0" v-b-tooltip.hover title="Main team">
-				<b-form-group 					
+				<b-form-group
 					v-for="(name,index) in runtime.value.names.filter((e,i) => (i < studentsPerTeam))"
-					:key="`name_${index}`">							
+					:key="`name_${index}`">
 					<b-row align-v="center">
-						<b-col cols="12" sm="auto">	
+						<b-col cols="12" sm="auto">
 							<label >Student name {{index+1}}</label>
 						</b-col>
 						<b-col col sm>
-							<b-form-input 
-								type="text" 
+							<b-form-input
+								type="text"
 								:disabled="ro"
 								:value="name"
 								:state="!/^\s*$/.test(name) ? null : false"
 								@input="update(['names'],`${index}`,$event)"
 								placeholder="don't leave me empty">
-							</b-form-input>		
+							</b-form-input>
 						</b-col>
 						<b-col cols="auto" sm="auto" v-show="!ro">
-							<b-btn 
+							<b-btn
 								:disabled="runtime.value.names.length < 3"
-								variant="outline-secondary" 
+								variant="outline-secondary"
 								@click="removeName(index)">
 								Remove
 							</b-btn>
 						</b-col>
 					</b-row>
-				</b-form-group>				
-			</b-alert>			
+				</b-form-group>
+			</b-alert>
 			<!-- Secondary team(s) -->
 			<b-alert v-if="runtime.value.names.length > studentsPerTeam" show variant="light" class="mt-0">
-				<b-form-group 					
+				<b-form-group
 					v-for="(name,index) in runtime.value.names.filter((e,i) => (i >= studentsPerTeam))"
-					:key="`name_${index+studentsPerTeam}`">							
+					:key="`name_${index+studentsPerTeam}`">
 					<b-row align-v="center">
-						<b-col cols="12" sm="auto">	
+						<b-col cols="12" sm="auto">
 							<label >Student name {{index+studentsPerTeam+1}}</label>
 						</b-col>
 						<b-col col sm>
-							<b-form-input 
-								type="text" 
+							<b-form-input
+								type="text"
 								:disabled="ro"
 								:value="name"
 								:state="!/^\s*$/.test(name) ? null : false"
 								@input="update(['names'],`${index+studentsPerTeam}`,$event)"
 								placeholder="don't leave me empty">
-							</b-form-input>		
+							</b-form-input>
 						</b-col>
 						<b-col cols="auto" sm="auto" v-show="!ro">
-							<b-btn 
+							<b-btn
 								:disabled="runtime.value.names.length < 3"
-								variant="outline-secondary" 
+								variant="outline-secondary"
 								@click="removeName(index+studentsPerTeam)">
 								Remove
 							</b-btn>
 						</b-col>
 					</b-row>
 				</b-form-group>
-			</b-alert>			
+			</b-alert>
 			<p v-if="!ro && !isAdmin" class="mt-3 pl-3 border border-bottom-0 border-top-0 border-right-0 border-dark">
 				<strong>Note</strong>: The team registration cost is calculated based on the number of participants and payment date:
 				<ul>
@@ -90,7 +90,7 @@
 					</li>
 				</ul>
 				The <strong>Total</strong> amount below is adjusted to account today's date.
-			</p>	
+			</p>
 			<hr class="my-4">
 			<!-- T-Shirts -->
 			<b-row align-h="between" align-v="center" class="my-3" v-show="showTShirts">
@@ -98,23 +98,23 @@
 					<h5 class="text-info">T-Shirts <small>($10 each)</small> </h5>
 				</b-col>
 				<b-col cols="auto" v-show="!ro">
-					<b-btn 
+					<b-btn
 						variant="outline-info"
 						@click="addTShirt">
 						Add more...
 					</b-btn>
 				</b-col>
 			</b-row>
-			<b-form-group 	
+			<b-form-group
 				v-for="(tshirt,index) in runtime.value.tshirts"
 				:key="`tshirt_${index}`"
-				v-show="showTShirts">						
+				v-show="showTShirts">
 				<b-row align-v="center">
-					<b-col col sm="auto">	
+					<b-col col sm="auto">
 						<label>Size/Qty</label>
 					</b-col>
 					<b-col col sm>
-						<b-select 
+						<b-select
 							:disabled="ro"
 							:value="tshirt.size"
 							:state="tshirt.size !== null ? null : false"
@@ -124,18 +124,18 @@
 						</b-select>
 					</b-col>
 					<b-col cols="2">
-						<b-form-input 
+						<b-form-input
 							:disabled="ro"
-							type="number" 
+							type="number"
 							min="0"
 							:value="tshirt.qty"
 							@input="update(['tshirts',`${index}`],'qty',$event)"
 							:state="tshirt.qty > 0 ? null : false">
-						</b-form-input>	
+						</b-form-input>
 					</b-col>
 					<b-col col sm="auto" v-show="!ro">
-						<b-btn 
-							variant="outline-secondary" 
+						<b-btn
+							variant="outline-secondary"
 							@click="removeTShirt(index)">
 							Remove
 						</b-btn>
@@ -146,23 +146,23 @@
 			<!-- Meals -->
 			<b-row align-h="between" align-v="center" class="my-3" v-show="showMeals">
 				<b-col cols="auto">
-					<h5 class="text-info">Meals <small>($7.5 each)</small></h5>
+					<h5 class="text-info">Meals <small>($8 each)</small></h5>
 				</b-col>
 			</b-row>
-			<b-form-group v-show="showMeals"> 	
+			<b-form-group v-show="showMeals">
 				<b-row align-v="center">
-					<b-col cols="auto" sm="auto">	
+					<b-col cols="auto" sm="auto">
 						<label>Number of meal tickets</label>
 					</b-col>
 					<b-col col sm="">
-						<b-form-input 
+						<b-form-input
 							:disabled="ro"
-							type="number" 
+							type="number"
 							min="0"
 							:value="runtime.value.meals"
 							:state="state(runtime.status.meals)"
 							@input="update([],'meals',$event)">
-						</b-form-input>	
+						</b-form-input>
 					</b-col>
 				</b-row>
 			</b-form-group>
@@ -176,7 +176,7 @@
 	import { mapGetters } from 'vuex';
 	const { cloneDeep } = require('lodash');
 	export default {
-		props: {			
+		props: {
 			value: Object,
 			ro: {
 				type: Boolean,
@@ -188,7 +188,7 @@
 				value: {},
 				status: {}
 			},
-			status: false,			
+			status: false,
 		}),
 		computed: {
 			...mapGetters({
@@ -229,7 +229,7 @@
 		},
 		methods: {
 			removeName(index) {
-				this.runtime.value.names.splice(index,1); 
+				this.runtime.value.names.splice(index,1);
 				this.runtime.status.names = this.validate('names');
 				this.update();
 			},
@@ -239,7 +239,7 @@
 				this.update();
 			},
 			removeTShirt(index) {
-				this.runtime.value.tshirts.splice(index,1); 
+				this.runtime.value.tshirts.splice(index,1);
 				this.runtime.status.tshirts = this.validate('tshirts');
 				this.update();
 			},
@@ -253,7 +253,7 @@
 			},
 			update(path = [], key, value) {
 				let query = [...path, key][0];
-				if(query) { 
+				if(query) {
 					path.reduce((target,key) => target[key],this.runtime.value)[key] = value;
 					this.runtime.status[query] = this.validate(query)
 				}
@@ -267,7 +267,7 @@
 				let subj = this.runtime.value[query];
 				switch (query) {
 					case "meals":
-						return /[0-9]+/.test(subj) && parseInt(subj) >= 0; 
+						return /[0-9]+/.test(subj) && parseInt(subj) >= 0;
 					case "tshirts":
 						return subj.reduce((a,i) => a && (i.size !== null) && (i.qty > 0), true);
 					case "names":
